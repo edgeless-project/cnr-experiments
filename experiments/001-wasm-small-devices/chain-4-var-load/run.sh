@@ -14,13 +14,12 @@ interarrival=0.5
 wasm_path=../../../../edgeless/edgeless_benchmark/functions/vector_mul/vector_mul.wasm
 redis_url=redis://127.0.0.1:6379/
 
-min_load=6
-max_load=10
+loads="1 2 3 4 6 8 10 15 20 25 30"
 min_seed=1
-max_seed=3
+max_seed=10
 
 for (( seed = $min_seed ; seed <= $max_seed ; seed++ )) ; do
-for (( load = $min_load ; load <= $max_load ; load++ )) ; do
+for load in $loads ; do
 	warmup=$(echo "$interarrival * $load" | bc)
 	duration=$(echo "$warmup + 10" | bc)
 	additional_fields="$(basename $PWD),$NODE,$load"
