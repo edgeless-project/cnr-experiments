@@ -1,6 +1,6 @@
 # 001-wasm-small-devices
 
-Scenario:
+## Scenario
 
 - e-ORC and e-CON on a server
 - node in a small device (Raspberry Pi or NVIDIA Jetson)

@@ -130,7 +130,7 @@ set xlabel "#workflows"
 set xlabel  font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  font "" textcolor lt -1 norotate
-set xrange [ 1.00000 : 30.0000 ] noreverse writeback
+set xrange [ 0.50000 : 30.5000 ] noreverse writeback
 set x2range [ 1.00000 : 20.0000 ] noreverse writeback
 set ylabel "Queueing latency (ms)"
 set ylabel  font "" textcolor lt -1 rotate
