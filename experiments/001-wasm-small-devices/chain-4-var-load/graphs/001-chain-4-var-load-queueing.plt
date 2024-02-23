@@ -126,7 +126,7 @@ set timestamp  font "" textcolor lt -1 norotate
 set trange [ * : * ] noreverse nowriteback
 set urange [ * : * ] noreverse nowriteback
 set vrange [ * : * ] noreverse nowriteback
-set xlabel "#workflows" 
+set xlabel "Apps"
 set xlabel  font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  font "" textcolor lt -1 norotate
@@ -170,6 +170,6 @@ set psdir
 set fit brief errorvariables nocovariancevariables errorscaling prescale nowrap v5
 GNUTERM = "wxt"
 ## Last datafile plotted: "../rpi.dat"
-plot '../rpi.dat'    u 1:3 w lp pt 4 lt 1 lc 1 title "RPi3",\
-     '../jetson.dat' u 1:3 w lp pt 6 lt 2 lc 2 title "JetsonNX"
+plot '../rpi.dat'    u 1:5 w lp pt 4 lt 1 lc 1 title "RPi3",\
+     '../jetson.dat' u 1:5 w lp pt 6 lt 2 lc 2 title "JetsonNX"
 #    EOF

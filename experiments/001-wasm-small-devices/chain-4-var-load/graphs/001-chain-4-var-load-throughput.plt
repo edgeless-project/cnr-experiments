@@ -126,13 +126,13 @@ set timestamp  font "" textcolor lt -1 norotate
 set trange [ * : * ] noreverse nowriteback
 set urange [ * : * ] noreverse nowriteback
 set vrange [ * : * ] noreverse nowriteback
-set xlabel "#workflows" 
+set xlabel "Apps"
 set xlabel  font "" textcolor lt -1 norotate
 set x2label "" 
 set x2label  font "" textcolor lt -1 norotate
 set xrange [ 0.50000 : 30.5000 ] noreverse writeback
 set x2range [ 1.00000 : 20.0000 ] noreverse writeback
-set ylabel "Total throughput (Hz)" 
+set ylabel "App invocation rate (1/s)" 
 set ylabel  font "" textcolor lt -1 rotate
 set y2label "" 
 set y2label  font "" textcolor lt -1 rotate
@@ -170,6 +170,9 @@ set psdir
 set fit brief errorvariables nocovariancevariables errorscaling prescale nowrap v5
 GNUTERM = "wxt"
 ## Last datafile plotted: "../rpi.dat"
-plot '../rpi.dat'    u 1:($2/10.0) w lp lt 1 lc 1 pt 4 title "RPi3",\
-     '../jetson.dat' u 1:($2/10.0) w lp lt 2 lc 2 pt 6 title "JetsonNX"
+plot \
+     '../rpi.dat'    u 1:($2/10.0) w lp lt 1 lc 1 pt 4 title "RPi3",\
+     ''    u 1:($2/10.0):($3/10.0):($4/10.0) w ye pt 0 lc 1 notitle,\
+     '../jetson.dat' u 1:($2/10.0) w lp lt 2 lc 2 pt 6 title "JetsonNX",\
+     ''    u 1:($2/10.0):($3/10.0):($4/10.0) w ye pt 0 lc 2 notitle
 #    EOF
