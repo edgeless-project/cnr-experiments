@@ -1,0 +1,28 @@
+[general]
+domain_id = "domain-1"
+orchestrator_url = "http://10.50.50.2:7011"
+orchestrator_url_announced = ""
+orchestrator_coap_url = "coap://10.50.50.2:7050"
+orchestrator_coap_url_announced = ""
+agent_url = "http://10.50.50.2:7121"
+agent_url_announced = ""
+invocation_url = "http://10.50.50.2:7102"
+invocation_url_announced = ""
+
+[baseline]
+orchestration_strategy = "Random"
+keep_alive_interval_secs = 10
+
+[proxy]
+proxy_type = "Redis"
+redis_url = "redis://127.0.0.1:6379/"
+
+[proxy.dataset_settings]
+dataset_path = "../dataset/"
+append = true
+additional_fields = "1"
+additional_header = "seed"
+
+[collector]
+collector_type = "Redis"
+redis_url = "redis://127.0.0.1:6379/"
