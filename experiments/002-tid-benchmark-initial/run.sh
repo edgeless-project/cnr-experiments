@@ -40,7 +40,7 @@ RUST_LOG=info $EDGELESS_ROOT/target/release/edgeless_benchmark \
 	--bind-address 10.50.50.2 \
 	--arrival-model poisson \
 	--warmup 0 \
-	--duration 14400 \
+	--duration 3600 \
 	--lifetime 600 \
 	--interarrival 60 \
 	--seed 1 \
