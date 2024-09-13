@@ -26,11 +26,10 @@ if [ $? -ne 0 ] ; then
 fi
 sleep 0.5
 
-
-git checkout head conf/orchestrator.toml
-sed -i -e "s/@ORCHESTRATION_STRATEGY/$orchestration" conf/orchestrator.toml
-sed -i -e "s/@ADDITIONAL_FIELDS/$seed,$additional_fields" conf/orchestrator.toml
-sed -i -e "s/@ADDITIONAL_HEADER/seed,$additional_header" conf/orchestrator.toml
+git checkout HEAD conf/orchestrator.toml
+sed -i -e "s/@ORCHESTRATION_STRATEGY/$orchestration/" conf/orchestrator.toml
+sed -i -e "s/@ADDITIONAL_FIELDS/$seed,$additional_fields/" conf/orchestrator.toml
+sed -i -e "s/@ADDITIONAL_HEADER/seed,$additional_header/" conf/orchestrator.toml
 echo "Starting the domain services"
 COMMAND=start ../../tid/domain.sh
 if [ $? -ne 0 ] ; then
@@ -50,7 +49,6 @@ if [ $? -ne 0 ] ; then
 fi
 
 echo "Starting the experiment"
-exit
 RUST_LOG=info $EDGELESS_ROOT/target/release/edgeless_benchmark \
 	--controller-url http://10.50.50.2:7001 \
 	--orchestrator-url http://10.50.50.2:7011 \
