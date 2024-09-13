@@ -1,0 +1,4 @@
+controller_url = "http://10.50.50.2:7001"
+orchestrators = [
+    { domain_id = "domain-1", orchestrator_url="http://10.50.50.2:7011" }
+]
