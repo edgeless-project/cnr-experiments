@@ -1,0 +1,3 @@
+NODES="edgeless-small-01 edgeless-small-02 edgeless-small-03 edgeless-small-04 edgeless-big-02"
+EDGELESS_ROOT=$HOME/edgeless/
+export NODES EDGELESS_ROOT
