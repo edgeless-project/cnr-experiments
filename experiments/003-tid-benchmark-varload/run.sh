@@ -2,7 +2,7 @@
 
 . environment
 
-seeds="1"
+seeds="1 2 3 4 5 6 7 8 9 10"
 orchestrations="Random RoundRobin"
 interarrivals="60 30 20 10"
 
