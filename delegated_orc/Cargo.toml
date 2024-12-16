@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: © 2024 Claudio Cicconetti <c.cicconetti@iit.cnr.it>
+# SPDX-License-Identifier: MIT
+
+[package]
+name = "delegated_orc"
+version = "0.0.1"
+authors = [ "Claudio Cicconetti <c.cicconetti@iit.cnr.it>" ]
+edition = "2021"
+description = "Simple delegated orc"
+homepage = "https://edgeless-project.eu/"
+license = "MIT"
+repository = "https://github.com/edgeless-project/edgeless/"
+readme = "README.md"
+
+[lib]
+name = "delegated_orc"
+path = "src/lib.rs"
+
+[[bin]]
+name = "delegated_orc"
+path = "src/bin/delegated_orc.rs"
+
+[dependencies]
+log = "0.4"
+env_logger = "0.10"
+anyhow = "1.0"
+edgeless_api = {path = "../../edgeless/edgeless_api", features = ["grpc_impl"]}
+edgeless_orc = {path = "../../edgeless/edgeless_orc" }
+clap = { version = "4.3", features=["derive"] }
+itertools = "0.13.0"
