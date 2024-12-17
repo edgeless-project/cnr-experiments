@@ -1,0 +1,67 @@
+{
+    "functions": [
+        {
+            "name": "trigger",
+            "class_specification": {
+                "id": "trigger",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../../edgeless/functions/trigger/trigger.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "out": "dup"
+            },
+            "annotations": {
+                "init-payload": "out_type=counter,arrival=e(100)",
+                "label_match_all": "core"
+            }
+        },
+        {
+            "name": "dup",
+            "class_specification": {
+                "id": "dup",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../../edgeless/functions/dup/dup.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "out1": "process",
+                "out2": "log"
+            },
+            "annotations": {
+                "label_match_all": "core"
+            }
+        },
+        {
+            "name": "process",
+            "class_specification": {
+                "id": "bench_process",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../../edgeless/functions/bench_process/bench_process.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "out": "log"
+            },
+            "annotations": {
+                "init-payload": "forward=true,fibonacci=10000",
+                "label_match_all": "edge"
+            }
+        }
+    ],
+    "resources": [
+        {
+            "name": "log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "trace-@WF_ID.log",
+                "add-timestamp": "true"
+            }
+        }
+    ],
+    "annotations": {}
+}
