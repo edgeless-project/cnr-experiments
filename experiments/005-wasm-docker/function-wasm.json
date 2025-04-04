@@ -1,0 +1,22 @@
+{
+    "functions": [
+        {
+            "name": "double",
+            "class_specification": {
+                "id": "double",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../../edgeless/functions/double/double.wasm",
+                "outputs": [
+                    "result"
+                ]
+            },
+            "output_mapping": {
+            },
+            "annotations": {}
+        }
+    ],
+    "resources": [
+    ],
+    "annotations": {}
+}

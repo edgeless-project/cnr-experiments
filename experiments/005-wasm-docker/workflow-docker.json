@@ -1,0 +1,50 @@
+{
+    "functions": [
+        {
+            "name": "trigger",
+            "class_specification": {
+                "id": "trigger",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../../edgeless/functions/trigger/trigger.wasm",
+                "outputs": [
+                    "out"
+                ]
+            },
+            "output_mapping": {
+                "out": "double"
+            },
+            "annotations": {
+                "init-payload": "out_type=counter,arrival=c(1000)"
+            }
+        },
+        {
+            "name": "double",
+            "class_specification": {
+                "id": "double",
+                "function_type": "CONTAINER",
+                "version": "0.1",
+                "code": "container:cnr_experiments_function_double:latest",
+                "outputs": [
+                    "output"
+                ]
+            },
+            "output_mapping": {
+                "output": "file-log"
+            },
+            "annotations": {}
+        }
+    ],
+    "resources": [
+        {
+            "name": "file-log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "output.log",
+                "add-timestamp": "true"
+            }
+        }
+    ],
+    "annotations": {}
+}

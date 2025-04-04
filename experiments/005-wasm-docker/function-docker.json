@@ -1,0 +1,22 @@
+{
+    "functions": [
+        {
+            "name": "double",
+            "class_specification": {
+                "id": "double",
+                "function_type": "CONTAINER",
+                "version": "0.1",
+                "code": "container:cnr_experiments_function_double:latest",
+                "outputs": [
+                    "output"
+                ]
+            },
+            "output_mapping": {
+            },
+            "annotations": {}
+        }
+    ],
+    "resources": [
+    ],
+    "annotations": {}
+}
