@@ -32,7 +32,9 @@
             "output_mapping": {
                 "result": "file-log"
             },
-            "annotations": {}
+            "annotations": {
+                "label_match_all": "edge"
+            }
         }
     ],
     "resources": [

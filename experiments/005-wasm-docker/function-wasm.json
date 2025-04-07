@@ -11,12 +11,12 @@
                     "result"
                 ]
             },
-            "output_mapping": {
-            },
-            "annotations": {}
+            "output_mapping": {},
+            "annotations": {
+                "label_match_all": "edge"
+            }
         }
     ],
-    "resources": [
-    ],
+    "resources": [],
     "annotations": {}
 }

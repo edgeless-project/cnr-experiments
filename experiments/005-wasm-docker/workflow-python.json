@@ -24,7 +24,7 @@
                 "id": "double",
                 "function_type": "CONTAINER",
                 "version": "0.1",
-                "code": "container:cnr_experiments_function_double:latest",
+                "code": "container:cnr_experiments_function_double_python:latest",
                 "outputs": [
                     "output"
                 ]
