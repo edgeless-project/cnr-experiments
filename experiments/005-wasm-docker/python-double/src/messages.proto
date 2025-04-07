@@ -1,0 +1,626 @@
+// SPDX-FileCopyrightText: © 2023 Technical University of Munich, Chair of Connected Mobility
+// SPDX-FileCopyrightText: © 2023 Claudio Cicconetti <c.cicconetti@iit.cnr.it>
+// SPDX-FileCopyrightText: © 2023 Siemens AG
+// SPDX-License-Identifier: MIT
+syntax = "proto3";
+
+package edgeless_api;
+
+// Function instance identifier.
+message InstanceId {
+    // Unique identifier of the node that hosts this instance.
+    string node_id = 1;
+    // Unique identifier of the function.
+    string function_id = 2;
+}
+
+// Function instance identifier used between clusters.
+message DomainManagedInstanceId {
+    // Unique identifier of the function.
+    string instance_id = 1;
+}
+
+// Consistency model of state.
+enum StatePolicy {
+   TRANSIENT  = 0;
+   NODE_LOCAL = 1;
+   GLOBAL     = 2;
+}
+
+// State specification.
+message StateSpecification {
+    // Unique identifier of the state.
+    string state_id = 1;
+    // Consistency model.
+    StatePolicy policy = 2;
+}
+
+// Message defining the function class specification.
+message FunctionClassSpecification {
+    // Function class identifier.
+    string function_class_id  = 1;
+    // Run-time agent type this function is made for.
+    string function_class_type = 2;
+    // Function class version.
+    string function_class_version = 3;
+    // Inline function's code (if present).
+    optional bytes function_class_code = 4;
+    // Output channels in which the function may generate new. Can be empty.
+    repeated string function_class_outputs = 5;
+}
+
+// Message to request the creation a new function instance.
+message SpawnFunctionRequest {
+    // The function class specification.
+    FunctionClassSpecification code = 2;
+    // The set of annotations associated with this function instance.
+    map<string, string> annotations = 3;
+    // The state specification.
+    StateSpecification state_specification = 4;
+    // The workflow id to which this function belongs
+    string workflow_id = 5;
+}
+
+// Some APIs provide the same inteface for logical vs physical identifiers.
+// This enables them to share a gRPC interface.
+message InstanceIdVariant {
+    oneof InstanceIdType {
+        InstanceId instance_id = 1;
+        DomainManagedInstanceId domain_managed_instance_id = 2;
+    }
+}
+
+// Response message to the creation a new function instance or the start of a
+// resource.
+message StartComponentResponse {
+    // If present it means that the request has been rejected.
+    // In this case, other fields may not be present or contain meaningful data.
+    optional ResponseError response_error = 1;
+
+    // The identifier of the newly-spawned function instance / newly-started
+    // resource, if accepted. The node identifier may be all-zeroes.
+    optional InstanceIdVariant instance_id = 2;
+}
+
+// Request message of NodeRegistrationAPI::UpdateNode().
+message UpdateNodeRequest {
+    // Identifier of the node.
+    string node_id                             = 2;
+    // URL of the node's agent server.
+    string agent_url                           = 3;
+    // URL of the node's invocation server.
+    string invocation_url                      = 4;
+    // Resources offered by this node.
+    repeated ResourceProviderSpecification resource_providers = 5;
+    // Node capabilities.
+    NodeCapabilities capabilities              = 6;
+    // Deadline for refreshing the node request, in seconds since Unix epoch.
+    // After this time the node can be considered to be offline.
+    uint64 refresh_deadline                    = 10;
+    // Number that identifies the specific instance of this node, which allows
+    // the node register to detect service restarts.
+    // It is drawn randomly when the node starts and never changes.
+    uint64 nonce                               = 11;
+    // Node health status.
+    NodeHealthStatus health_status             = 20;
+    // Node performance info.
+    NodePerformanceSamples performance_samples = 30;
+
+}
+
+// Node capabilities exposed to the orchestrator.
+message NodeCapabilities {
+    // Number of (actual or virtual) CPUs associated with the edge node.
+    uint32 num_cpus          = 10;
+    // Name of the CPU model.
+    string model_name_cpu    = 11;
+    // Clock frequency of the CPU, in BogoMIPS.
+    float clock_freq_cpu     = 12;
+    // Number of physical cores.
+    uint32 num_cores         = 13;
+    // Size of memory available to applications running on the edge node, in MiB.
+    uint32 mem_size          = 14;
+    // List of labels assigned to this node.
+    repeated string labels   = 20;
+    // True if the node is running inside a Trusted Execution Environment.
+    bool is_tee_running      = 30;
+    // True if the node has a Trusted Platform Module for authenticated registration.
+    bool has_tpm             = 40;
+    // List of run-times supported by the node.
+    repeated string runtimes = 50;
+    // Total disk space, in MiB.
+    uint32 disk_tot_space    = 70;
+    // Number of (actual or virtual) GPUs associated with the edge node.
+    uint32 num_gpus          = 80;
+    // Name of the GPU model.
+    string model_name_gpu    = 81;
+    // GPU memory available, in MiB.
+    uint32 mem_size_gpu      = 82;
+}
+
+// Response message of NodeRegistrationAPI::UpdateNode().
+message UpdateNodeResponse {
+    // If present it means that the request has been rejected.
+    // In this case, other fields may not be present or contain meaningful data.
+    optional ResponseError response_error = 1;
+}
+
+// Possible message type of FunctionInstance::UpdatePeersRequest().
+enum UpdatePeersRequestType {
+    ADD   = 0; // add one peer
+    DEL   = 1; // delete one peer
+    CLEAR = 2; // delete all peers
+}
+
+// Request message of FunctionInstance::UpdatePeersRequest().
+message UpdatePeersRequest {
+    // Request type. Always present.
+    UpdatePeersRequestType request_type = 1;
+    // Identifier of the peer node. Always present, unless type is CLEAR.
+    optional string node_id             = 2;
+    // URL of the peer node's invocation server. Always present if ADD type.
+    optional string invocation_url      = 3;
+}
+
+// Data structure representing a sample with timestamp.
+message Sample {
+    // Number of seconds since Unix epoch.
+    int64  timestamp_sec = 1;
+    // Number of nanoseconds since the last second boundary.
+    uint32 timestamp_ns  = 2;
+    // Sample value.
+    double sample        = 3;
+}
+
+// Data structure representing samples associated with an identifier.
+message Samples {
+    string          id      = 1;
+    repeated Sample samples = 10;
+}
+
+// Node health status.
+message NodeHealthStatus {
+    // Global CPU usage, in percentage.
+    // Removed: metric is too variable to be used.
+    // int32 cpu_usage      = 10;
+    // Load, as the sum of usage of all the CPUs.
+    // Removed: metric is too variable to be used.
+    // int32 cpu_load       = 11;
+
+    // Free memory, in kbytes.
+    int32 mem_free       = 20;
+    // Used memory, in kbytes.
+    int32 mem_used       = 21;
+    // Total memory, in kbytes.
+    // Removed: can be inferred from the node's capabilities.
+    // int32 mem_total      = 22;
+    // Available memory, in kbytes
+    int32 mem_available  = 23;
+
+    // CPU usage of the current process, in percentage.
+    int32 proc_cpu_usage = 30;
+    // Memory occupied by this process, in kbytes.
+    int32 proc_memory    = 31;
+    // Virtual memory occupied by this process, in kbytes.
+    int32 proc_vmemory   = 32;
+
+    // Load, one minute average, in percentage.
+    int32 load_avg_1     = 40;
+    // Load, five minutes average, in percentage.
+    int32 load_avg_5     = 41;
+    // Load, fifteen minutes average, in percentage.
+    int32 load_avg_15    = 42;
+    
+    // Total received traffic on all the network interfaces, in bytes.
+    int64 tot_rx_bytes   = 50;
+    // Total received traffic on all the network interfaces, in packets.
+    int64 tot_rx_pkts    = 51;
+    // Total rx errors on all the network interfaces.
+    int64 tot_rx_errs    = 52;
+
+    // Total transmitted traffic on all the network interfaces, in bytes.
+    int64 tot_tx_bytes   = 60;
+    // Total transmitted traffic on all the network interfaces, in packets.
+    int64 tot_tx_pkts    = 61;
+    // Total tx errors on all the network interfaces.
+    int64 tot_tx_errs    = 62;
+
+    // Total disk space, in bytes.
+    // int64 disk_tot_space  = 70;
+    // Removed: can be inferred from the node's capabilities.
+    // Available disk space, in bytes.
+    int64 disk_free_space = 71;
+    // Total disk reads, in bytes.
+    int64 disk_tot_reads  = 72;
+    // Total disk writes, in bytes.
+    int64 disk_tot_writes = 73;
+
+    // Instantaneous GPU load percentage (0-100%)
+    int32 gpu_load_perc = 80;
+    // GPU instantaneous temp in Celsius multiplied by 1000
+    int32 gpu_temp_cels = 81;
+}
+
+// Node performance samples.
+message NodePerformanceSamples {
+    // Function execution times.
+    // The identifier is the physical component identifier.
+    // The samples are execution times, in fractional seconds.
+    repeated Samples function_execution_times = 100;
+    // Function transfer times.
+    // The identifier is the physical component identifier.
+    // The samples are transfer times, in fractional seconds, from when the
+    // event was created and when it was executed.
+    repeated Samples function_transfer_times  = 110;
+}
+
+// Message to request the update of a function instance.
+message PatchRequest {
+    // The function instance identifier.
+    string function_id = 1;
+    // Mapping of the outputs to concrete function/resource instances.
+    map<string, InstanceId> output_mapping = 3;
+}
+
+// Message definining a workflow resource.
+message WorkflowResource {
+    // Name of the resource, local to the workflow specification,
+    string name = 1;
+    // Resource type.
+    string class_type = 2;
+    // Mapping of the outputs to other functions/resources in the workflow.
+    map<string, string> output_mapping = 3;
+    // Configuration of the resource, which depends on the resource type.
+    map<string, string> configurations = 4;
+}
+
+// Message defining a function within a workflow.
+message WorkflowFunction {
+    // Name of this function within the workflow.
+    string name = 1;
+    // Specification of the function.
+    FunctionClassSpecification class_spec = 2;
+    // Mapping of the outputs to other functions/resources in the workflow.
+    map<string, string> output_mapping = 3;
+    // Annotations associated with this function, if any.
+    map<string, string> annotations = 4;
+}
+
+// Message defining a request to create a new workflow.
+message SpawnWorkflowRequest {
+    // Functions of the workflow, in arbitrary order. Cannot be empty.
+    // The functions and resources are identified within the workflow by
+    // the names, which must be unique.
+    repeated WorkflowFunction workflow_functions = 1;
+    // Resources used within the workflow, if any, in arbitrary order.
+    repeated WorkflowResource workflow_resources = 2;
+    // Annotations associated with this workflow, if any.
+    map<string, string> annotations = 3;
+}
+
+// Response to a request to create a new workflow.
+message SpawnWorkflowResponse {
+    // If present it means that the request has been rejected.
+    // In this case, other fields may not be present or contain meaningful data.
+    optional ResponseError response_error = 1;
+
+    // The status of the newly-created workflow, if request accepted.
+    optional WorkflowInstanceStatus workflow_status = 2;
+}
+
+// Mapping between the function/resource names within a workflow and
+// the orchestration domain to which they have been allocated.
+message WorkflowFunctionMapping {
+    // Name of the function/resource within the workflow.
+    string name        = 1;
+    // Unique identifier of the function/resource in an orchestration domain.
+    string function_id = 2;
+    // Unique identifier of the orchestration domain handling the function/resource.
+    string domain_id   = 3;
+}
+
+// Status of a workflow instance returned to a client when its request to create
+// a workflow has been accepted.
+message WorkflowInstanceStatus {
+    // Workflow identifier.
+    WorkflowId workflow_id = 1;
+    // List of function instance mappings.
+    repeated WorkflowFunctionMapping domain_mapping = 2;
+}
+
+// Identifier of the workflow.
+message WorkflowId {
+    string workflow_id = 1;
+}
+
+// List of workflow identifiers.
+message WorkflowIdList {
+    repeated string identifiers = 1;
+}
+
+// Info about a workflow.
+message WorkflowInstanceInfo {
+    // The workflow spawn request.
+    SpawnWorkflowRequest   request = 1;
+    // The workflow status.
+    WorkflowInstanceStatus status  = 2;   
+}
+
+// Identifier of a domain.
+message DomainId {
+    string domain_id = 1;
+}
+
+// Capabilities of a given domain.
+message DomainCapabilitiesEntry {
+    // Domain identifier.
+    string domain_id                       = 1;
+    // Domain capabilities.
+    DomainCapabilities domain_capabilities = 2;
+}
+
+// List of domain capabilities.
+message DomainCapabilitiesList {
+    repeated DomainCapabilitiesEntry domain_capabilities = 1;
+}
+
+// Request message of DomainRegistrationAPI::UpdateDomain().
+message UpdateDomainRequest {
+    // Domain name.
+    string domain_id                = 10;
+    // URL of the orchestrator server.
+    string orchestrator_url         = 20;
+    // Domain capabilities.
+    DomainCapabilities capabilities = 30;
+    // Deadline for refreshing the domain request, in seconds since Unix epoch.
+    // After this time the orchestration domain can be considered to be offline.
+    uint64 refresh_deadline         = 40;
+    // Incremental counter updated every time the capabilities change.
+    uint64 counter                  = 50;
+    // Number that identifies the specific instance of this orchestrator, which
+    // allows the domain register to detect service restarts.
+    // It is drawn randomly when the node starts and never changes.
+    uint64 nonce                     = 51;
+}
+
+// Domain capabilities exposed from the orchestrator to the controller.
+message DomainCapabilities {
+    // Number of nodes.
+    uint32 num_nodes          = 1;
+    // Total number of (actual or virtual) CPUs.
+    uint32 num_cpus           = 10;
+    // Total number of physical cores.
+    uint32 num_cores          = 11;
+    // Total size of memory available, in MiB.
+    uint32 mem_size           = 12;
+    // Superset of all the labels advertised by the nodes in the domain.
+    repeated string labels    = 20;
+    // Number of nodes with a Trusted Execution Environment.
+    uint32 num_tee            = 30;
+    // Number of nodes with a Trusted Platform Module.
+    uint32 num_tpm            = 40;
+    // Superset of all the run-times supported by the nodes in the domain.
+    repeated string runtimes  = 50;
+    // Total disk space, in MiB.
+    uint32 disk_tot_space     = 60;
+    // Total number of (actual or virtual) GPUs.
+    uint32 num_gpus           = 70;
+    // Total GPU memory available, in MiB.
+    uint32 mem_size_gpu       = 71;
+    // Superset of the names of the resource providers advertised by the nodes.
+    repeated string resource_providers = 80;
+    // Superset of the classes of the resource providers advertised by the nodes.
+    repeated string resource_classes   = 81;
+}
+
+// Response message of DomainRegistrationAPI::UpdateDomain().
+message UpdateDomainResponse {
+    // If present it means that the request has been rejected.
+    // In this case, other fields may not be present or contain meaningful data.
+    optional ResponseError response_error = 1;
+
+    // If the flag is true then the orchestration domain should be reset to
+    // an empty state.
+    bool reset = 2;
+}
+
+// message Domain
+
+// Event types.
+enum EventType {
+    // Function invocation for which a return value is expected.
+    CALL        = 0;
+    // Function invocation for which no return is expected.
+    CAST        = 1;
+    // Return value of a function invocation, with data.
+    CALL_RET    = 2;
+    // Return value of a function invocation, without any data.
+    CALL_NO_RET = 3;
+    // Error return type.
+    ERR         = 4;
+}
+
+// Data associated with an event.
+message EventData {
+    // Event type.
+    EventType event_type = 1;
+    // Payload.
+    string payload = 2;
+}
+
+// Timestamp associated with an event.
+message EventTimestamp {
+    // Number of seconds since Unix epoch.
+    int64  secs   = 1;
+    // Number of nanoseconds since the last second boundary.
+    uint32 nsecs  = 2;
+}
+
+// Event.
+message Event {
+    // The function instance that is expected to handle the event (callee).
+    InstanceId     target     = 1;
+    // The function instance that generated the event (caller).
+    InstanceId     source     = 2;
+    // Ongoing transaction identifier.
+    uint64         stream_id  = 3;
+    // Event data.
+    EventData      msg        = 4;
+    // Timestamp of when the message was created.
+    EventTimestamp created    = 5;
+}
+
+// Resource provider specification.
+message ResourceProviderSpecification {
+    // Unique identifier of the resource provider.
+    string provider_id       = 1;
+    // Type of the resource provided.
+    string class_type        = 2;
+    // List of callbacks that can be invoked.
+    repeated string outputs  = 3;
+}
+
+// Resource instance specification.
+message ResourceInstanceSpecification {
+    // Unique identifier of the resource provider.
+    string resource_class_type = 1;
+    // Resource configuration (depends on the type).
+    map<string, string> configuration = 2;
+    // The workflow id to which this resource instance belongs 
+    string workflow_id = 3;
+}
+
+// Message containing information provided as response to failed request.
+// The fields are inspired from the "problem detail" responses:
+//
+// https://www.rfc-editor.org/rfc/rfc7807.txt
+//
+// Currently all the fields are human-readable, i.e., they are intended to
+// be shown and processed by human operators. Further optional fields might be
+// added in the future that contain binary representations of information
+// intended for machine processing, instead.
+message ResponseError {
+    // A short, human-readable summary of the problem type.
+    // It should not change from occurrence to occurrence of the error.
+    string summary = 1;
+
+    // A human-readable explanation specific to this occurrence of the problem.
+    optional string detail = 2;
+}
+
+// Argument of GuestAPIFunction::Boot().
+message BootData {
+    // End-point of the GuestAPIHost.
+    string guest_api_host_endpoint = 1;
+
+    // Instance ID of the function to be booted.
+    InstanceId instance_id         = 2;
+}
+
+// Argument of GuestAPIFunction::Init().
+message FunctionInstanceInit {
+    // The initializaton string. Can be empty.
+    string init_payload     = 1;
+
+    // The initial state. Can be empty.
+    bytes serialized_state = 10;
+}
+
+// Argument of GuestAPIFunction::Cast() and GuestAPIFunction::Call().
+message InputEventData {
+    // The function instance that generated the event.
+    InstanceId src = 1;
+    
+    // The event payload. Can be empty.
+    bytes msg     = 2;
+}
+
+// Types of CallReturn.
+enum CallRetType {
+    // The return value does not contain a reply message.
+    CALL_RET_NO_REPLY = 0;
+    // The return value contains a reply message.
+    CALL_RET_REPLY    = 1;
+    // There was an error when invoking Call().
+    CALL_RET_ERR      = 2;
+}
+
+// Return value of GuestAPIFunction::Call() and GuestAPIHost::Call().
+message CallReturn {
+    // Return type.
+    CallRetType type  = 1;
+
+    // Reply message. Can only be empty with type = Type::REPLY.
+    bytes msg        = 2;
+}
+
+// Argument of GuestAPIHost::Cast() and GuestAPIHost::Call().
+message OutputEventData {
+    // The event originator (to identify the function instance on the host).
+    InstanceId originator = 1;
+
+    // The alias of the function instance recipient of this event.
+    string alias          = 2;
+    
+    // The event payload. Can be empty.
+    bytes msg             = 3;
+}
+
+// Argument of GuestAPIHost::Cast() and GuestAPIHost::Call().
+message OutputEventDataRaw {
+    // The event originator (to identify the function instance on the host).
+    InstanceId originator = 1;
+
+    // The function instance recipient of this event.
+    InstanceId dst        = 2;
+    
+    // The event payload. Can be empty.
+    bytes msg             = 3;
+}
+
+enum TelemetryLogLevel {
+    LOG_ERROR = 0;
+    LOG_WARN  = 1;
+    LOG_INFO  = 2;
+    LOG_DEBUG = 3;
+    LOG_TRACE = 4;
+}
+
+// Argument of GuestAPIHost::TelemetryLog().
+message TelemetryLogEvent {
+    // The command originator (to identify the function instance on the host).
+    InstanceId originator       = 1;
+
+    // The log level.
+    TelemetryLogLevel log_level = 2;
+
+    // The target.
+    string target               = 3;
+
+    // The message.
+    string msg                  = 4;
+}
+
+// Argument of GuestAPIHost::DelayedCast().
+message DelayedEventData {
+    // The event originator (to identify the function instance on the host).
+    InstanceId originator = 1;
+
+    // The alias of the function instance recipient of this event.
+    string alias          = 2;
+    
+    // The event payload. Can be empty.
+    bytes msg             = 3;
+
+    // The delay after which this event has to be generated, in ms.
+    uint64 delay          = 4;
+}
+
+// Argument of GuestAPIHost::Sync().
+message SyncData {
+    // The command originator (to identify the function instance on the host).
+    InstanceId originator  = 1;
+
+    // The function instance state to be serialized (opaque to the platform).
+    bytes serialized_state = 2;
+}

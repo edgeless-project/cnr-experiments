@@ -1,0 +1,189 @@
+// SPDX-FileCopyrightText: © 2023 Technical University of Munich, Chair of Connected Mobility
+// SPDX-FileCopyrightText: © 2023 Claudio Cicconetti <c.cicconetti@iit.cnr.it>
+// SPDX-FileCopyrightText: © 2023 Siemens AG
+// SPDX-License-Identifier: MIT
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "messages.proto";
+
+package edgeless_api;
+
+// API exposed by the nodes / orchestrator to manage the lifecycle of function instances.
+service FunctionInstance {
+    // Start a new function instance.
+    // Input: request containing the description of the function to create.
+    // Output: the function instance identifier assigned, if accepted.
+    rpc Start (SpawnFunctionRequest) returns (StartComponentResponse);
+    
+    // Stop a running function instance.
+    // Input: the identifier of the function instance to tear down.
+    // Output: none.
+    rpc Stop (InstanceIdVariant) returns (google.protobuf.Empty );
+
+    // Patch functions by updating for a given function identifier the
+    // mapping from the channel to a list of functions/resources to which events
+    // should be directed.
+    // Input: the updated mapping.
+    // Output: none.
+    rpc Patch (PatchRequest) returns (google.protobuf.Empty);
+}
+
+// API for per-node management functionality
+service NodeManagement {
+    // Update the dataplane of a node by adding/removing peers.
+    // Input: the node identifier and invocation URL (only for add operations).
+    // Output: none.
+    rpc UpdatePeers (UpdatePeersRequest) returns (google.protobuf.Empty);
+    // Reset the node to a clean state.
+    // Input: none.
+    // Output: none.
+    rpc Reset (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+// API that allows nodes to register themselves with the orchestrator.
+service NodeRegistration {
+    // Notify that the node is alive (also acts as registration).
+    // Input: registration: identifier of the new node and agent/invocation
+    // URLs, health status information, and performance samples.
+    // deregistration: identifier of the existing node to be deregistered.
+    // Output: UpdateNodeResponse.
+    rpc UpdateNode (UpdateNodeRequest) returns (UpdateNodeResponse);
+}
+
+// API that allows the orchestrators to register with the controller.
+service DomainRegistration {
+    // Register a new orchestration domain on a controller.
+    // Input: registration data, including a deadline by which the orchestration
+    // domain can be considered offline; to disconnect a domain, use a value in
+    // the past for this deadline
+    // Output: UpdateDomainResponse.
+    rpc UpdateDomain (UpdateDomainRequest) returns (UpdateDomainResponse);
+}
+
+// API to manage the lifecycle of workflow instances.
+service WorkflowInstance {
+    // Start a new workflow.
+    // Input: request containing the description of the workflow to create.
+    // Output: the status of workflow instance newly created, if accepted.
+    rpc Start (SpawnWorkflowRequest) returns (SpawnWorkflowResponse);
+
+    // Stop an active workflow.
+    // Input: the identifier of the workflow to tear down.
+    // Output: none.
+    rpc Stop (WorkflowId) returns (google.protobuf.Empty);
+
+    // List the known workflow identifiers.
+    // Input: none.
+    // Output: the list of workflow identifiers..
+    rpc List (google.protobuf.Empty) returns (WorkflowIdList);
+
+    // Inspect a given workflow.
+    // Input: the identifier of the workflow to inspect.
+    // Output: information about the workflow identifiers.
+    rpc Inspect(WorkflowId) returns (WorkflowInstanceInfo);
+
+    // List the domain capabilities.
+    // Input: the identifier of the domain or an empty value to query all.
+    // Output: the list of capabilities of the known domains.
+    rpc Domains (DomainId) returns (DomainCapabilitiesList);
+}
+
+// API to handle events.
+service FunctionInvocation {
+    // Handle an event.
+    // Input: event to be handled.
+    // Output: none.
+    rpc Handle (Event) returns (google.protobuf.Empty); 
+}
+
+// API to handle the lifecycle of resources.
+service ResourceConfiguration {
+    // Create a new resource.
+    // Input: specification of the resource to be created.
+    // Output: the identifier of the newly created resource, if accepted.
+    rpc Start (ResourceInstanceSpecification) returns (StartComponentResponse);
+
+    // Terminate an existing resource.
+    // Input: the identifier of the resource to be terminated.
+    // Output: none.
+    rpc Stop (InstanceIdVariant) returns (google.protobuf.Empty);
+
+    // Patch resources by updating for a given identifier the
+    // mapping from the channel to a list of functions/resources to which events
+    // should be directed.
+    // Input: the updated mapping.
+    // Output: none.
+    rpc Patch (PatchRequest) returns (google.protobuf.Empty);
+}
+
+// API exposed by a function to manage the lifecycle and run-time of a function instance.
+service GuestAPIFunction {
+    // Create the function instance.
+    // Input: the end-point of the GuestAPIHost.
+    // Output: none.
+    rpc Boot (BootData) returns (google.protobuf.Empty);
+
+    // Initialize the function instance.
+    // Input: the payload and saved state of the function instance.
+    // Output: none.
+    rpc Init (FunctionInstanceInit) returns (google.protobuf.Empty);
+
+    // Invoke the function instance (asynchronous).
+    // Input: the source instance identifier and function arguments.
+    // Output: none.
+    rpc Cast (InputEventData) returns (google.protobuf.Empty);
+
+    // Invoke the function instance and wait for a return.
+    // Input: the source instance identifier and function arguments.
+    // Output: the return value.
+    rpc Call (InputEventData) returns (CallReturn);
+
+    // Clean up the function instance before termination.
+    // Input: none.
+    // Output: none.
+    rpc Stop (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+// API exposed by a node towards a function instance.
+service GuestAPIHost {
+    // Generate an asynchronous event.
+    // Input: the destination (alias) and payload of the event generated.
+    // Output: none.
+    rpc Cast (OutputEventData) returns (google.protobuf.Empty);
+
+    // Generate an asynchronous event on a specific function instance.
+    // Input: the destination and payload of the event generated.
+    // Output: none.
+    rpc CastRaw (OutputEventDataRaw) returns (google.protobuf.Empty);
+
+    // Generate a synchronous event for which a return is expected.
+    // Input: the destination (alias) and payload of the event generated.
+    // Output: none.
+    rpc Call (OutputEventData) returns (CallReturn);
+
+    // Generate a synchronous event for which a return is expected on a specific function instance.
+    // Input: the destination and payload of the event generated.
+    // Output: none.
+    rpc CallRaw (OutputEventDataRaw) returns (CallReturn);
+
+    // Generate a telemetry log event.
+    // Input: the log data.
+    // Output: none.
+    rpc TelemetryLog (TelemetryLogEvent) returns (google.protobuf.Empty);
+
+    // Return the identifier of the current function instance.
+    // Input: none.
+    // Output: the function instance identifier.
+    rpc Slf (google.protobuf.Empty) returns (InstanceId);
+
+    // Generate an asynchronous event at a later time.
+    // Input: the delay, destination (alias) and payload of the event generated.
+    // Output: none.
+    rpc DelayedCast (DelayedEventData) returns (google.protobuf.Empty);
+
+    // Synchronize distributed state.
+    // Input: the state to be synchronized.
+    // Output: none.
+    rpc Sync (SyncData) returns (google.protobuf.Empty);
+}
