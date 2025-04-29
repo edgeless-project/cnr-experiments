@@ -4,63 +4,14 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+from utils import box_plot, time_plot, load_dataset
 
-IMAGE_TYPE = os.environ.get("IMAGE_TYPE", "pdf")
 HEALTH_STATUS = os.environ.get("HEALTH_STATUS", "dataset/health_status.csv")
-CAPABILITIES = os.environ.get("CAPABILITIES", "dataset/capabilities.csv")
 SHOW = bool(os.environ.get("SHOW", ""))
 
-
-def plot(df, x: str, y: str, hue: str | None, ylabel: str, show: bool, filename: str):
-    fig, ax = plt.subplots()
-    sns.boxplot(df, x=x, y=y, hue=hue, ax=ax)
-    ax.set_ylabel(ylabel)
-    ax.set_title("")
-    fig.suptitle("")
-    if show:
-        plt.show(block=False)
-    else:
-        plt.savefig("{}.{}".format(filename, IMAGE_TYPE))
-
-
-def time_plot(
-    df, x: str, y: str, hue: str | None, ylabel: str, show: bool, filename: str
-):
-    fig, ax = plt.subplots()
-    sns.lineplot(df, x=x, y=y, hue=hue, ax=ax)
-    ax.set_ylabel(ylabel)
-    ax.set_title("")
-    fig.suptitle("")
-    if show:
-        plt.show(block=False)
-    else:
-        plt.savefig("{}.{}".format(filename, IMAGE_TYPE))
-
-
-def pd_set_options():
-    pd.set_option("display.show_dimensions", False)
-    pd.set_option("display.max_columns", None)
-    pd.set_option("display.max_colwidth", None)
-
-
-def load_node_names():
-    df = pd.read_csv(CAPABILITIES)
-    ret = dict()
-    for _id, node_id, labels in df[["node_id", "labels"]].itertuples():
-        labels = str(labels).replace("[", "").replace("]", "")
-        ret[node_id] = labels
-    return ret
-
-
-pd_set_options()
-node_names = load_node_names()
 basename = os.path.basename(os.getcwd())
 
-df = pd.read_csv(HEALTH_STATUS)
-df["timestamp"] = df["timestamp"] - df["timestamp"].min()
-df.drop(df[df.timestamp > 86400].index, inplace=True)
-
-df = df.replace(node_names)
+df = load_dataset(HEALTH_STATUS, min_timestamp=0, max_timestamp=86400)
 
 df["mem_occupancy"] = (df["mem_used"] / df["mem_available"]) * 100
 
@@ -79,11 +30,13 @@ metrics = [
 ]
 
 for y, ylabel in metrics:
-    plot(
+    box_plot(
         df,
         x="node_id",
         y=y,
         ylabel=ylabel,
+        ylim=None,
+        yscale="linear",
         hue=None,
         show=SHOW,
         filename="{}-{}-box".format(basename, y),

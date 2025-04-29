@@ -7,3 +7,4 @@ experiments/006-ced21-small/cli.toml
 experiments/006-ced21-small/controller.toml
 experiments/006-ced21-small/edgeless_inabox.log
 experiments/006-ced21-small/orchestrator.toml
+*.pyc
