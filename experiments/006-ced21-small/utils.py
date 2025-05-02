@@ -50,6 +50,24 @@ def box_plot(
         plt.savefig("{}.{}".format(filename, IMAGE_TYPE))
 
 
+def ecdf_plot(
+    df,
+    x: str,
+    hue: str | None,
+    show: bool,
+    filename: str,
+):
+    fig, ax = plt.subplots()
+    sns.ecdfplot(df, x=x, hue=hue, ax=ax)
+    ax.set_ylabel("ECDF")
+    ax.set_title("")
+    fig.suptitle("")
+    if show:
+        plt.show(block=False)
+    else:
+        plt.savefig("{}.{}".format(filename, IMAGE_TYPE))
+
+
 def time_plot(
     df, x: str, y: str, hue: str | None, ylabel: str, show: bool, filename: str
 ):
@@ -76,8 +94,10 @@ def load_node_names():
     for _id, node_id, labels in df[["node_id", "labels"]].itertuples():
         labels = str(labels).replace("[", "").replace("]", "")
         tokens = labels.split(";")
-        if len(tokens) == 3:
+        if len(tokens) == 3 and tokens[0] == "edge":
             node_name = tokens[2]
+        elif len(tokens) == 2 and tokens[0] == "server":
+            node_name = tokens[1]
         else:
             node_name = node_id
         ret[node_id] = node_name
@@ -89,4 +109,14 @@ def map_physical_to_node_id():
     ret = dict()
     for _id, node_id, physical_id in df[["node_id", "physical_id"]].itertuples():
         ret[physical_id] = node_id
+    return ret
+
+
+def map_physical_to_workflow_id():
+    df = pd.read_csv(MAPPING_TO_INSTANCE_ID)
+    ret = dict()
+    for _id, workflow_id, physical_id in df[
+        ["workflow_id", "physical_id"]
+    ].itertuples():
+        ret[physical_id] = workflow_id
     return ret

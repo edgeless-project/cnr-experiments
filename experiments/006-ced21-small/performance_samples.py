@@ -13,7 +13,9 @@ SHOW = bool(os.environ.get("SHOW", ""))
 
 basename = os.path.basename(os.getcwd())
 
-df = load_dataset(PERFORMANCE_SAMPLES, min_timestamp=0, max_timestamp=86400)
+df = load_dataset(PERFORMANCE_SAMPLES, min_timestamp=0, max_timestamp=7200)
+
+df = df[df["metric"].isin(["function_execution_time", "function_transfer_time"])]
 
 df.replace(map_physical_to_node_id(), inplace=True)
 df.rename(columns={"identifier": "node_id"}, inplace=True)
