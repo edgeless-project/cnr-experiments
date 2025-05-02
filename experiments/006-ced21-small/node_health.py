@@ -11,7 +11,7 @@ SHOW = bool(os.environ.get("SHOW", ""))
 
 basename = os.path.basename(os.getcwd())
 
-df = load_dataset(HEALTH_STATUS, min_timestamp=0, max_timestamp=86400)
+df = load_dataset(HEALTH_STATUS, min_timestamp=0, max_timestamp=7200)
 
 df["mem_occupancy"] = (df["mem_used"] / df["mem_available"]) * 100
 
