@@ -1,15 +1,16 @@
 {
   "min_transaction_interval_ms": 500,
   "max_transaction_interval_ms": 1500,
-  "min_input_size": 100,
-  "max_input_size": 1000,
+  "min_input_size": 10000,
+  "max_input_size": 100000,
   "min_num_stages": 1,
   "max_num_stages": 3,
   "min_fan_out": 1,
   "max_fan_out": 3,
-  "min_fibonacci": 1000,
-  "max_fibonacci": 5000,
+  "min_fibonacci": 20000,
+  "max_fibonacci": 50000,
   "min_memory_bytes": 0,
   "max_memory_bytes": 0,
-  "functions_path": "functions/"
+  "functions_path": "functions/",
+  "redis_url": "redis://127.0.0.1:6379/"
 }

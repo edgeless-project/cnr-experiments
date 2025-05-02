@@ -33,6 +33,11 @@ with open(PERFORMANCE_SAMPLES, "r") as infile:
         timestamp = float(timestamp)
         min_timestamp = min(timestamp, min_timestamp)
         msg_id = int(value)
+        if identifier not in pid_to_wid:
+            print(
+                "ignoring sample from unknown physical identifier {}".format(identifier)
+            )
+            continue
         wid = pid_to_wid[identifier]
 
         if wid not in timestamps:
