@@ -1,11 +1,12 @@
 .venv
 log
 .DS_Store
+*.pyc
 target
 settings.json
 experiments/006-ced21-small/cli.toml
 experiments/006-ced21-small/controller.toml
 experiments/006-ced21-small/edgeless_inabox.log
-experiments/006-ced21-small/orchestrator.toml
-*.pyc
 experiments/006-ced21-small/node.toml
+experiments/006-ced21-small/orchestrator.toml
+*.save

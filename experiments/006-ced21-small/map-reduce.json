@@ -12,5 +12,5 @@
   "min_memory_bytes": 0,
   "max_memory_bytes": 0,
   "functions_path": "functions/",
-  "redis_url": "redis://127.0.0.1:6379/"
+  "redis_url": "redis://127.0.0.1:6379/1"
 }
