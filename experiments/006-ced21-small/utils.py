@@ -10,16 +10,28 @@ CAPABILITIES = os.environ.get("CAPABILITIES", "dataset/capabilities.csv")
 MAPPING_TO_INSTANCE_ID = os.environ.get(
     "MAPPING_TO_INSTANCE_ID", "dataset/mapping_to_instance_id.csv"
 )
+SHOW = bool(os.environ.get("SHOW", ""))
 
 
-def load_dataset(filename: str, min_timestamp: float, max_timestamp: float):
+def show_or_save(filename: str):
+    if SHOW:
+        plt.show(block=False)
+    else:
+        plt.savefig("{}.{}".format(filename, IMAGE_TYPE))
+
+
+def load_dataset(
+    filename: str, min_timestamp: float | None, max_timestamp: float | None
+):
     pd_set_options()
 
     df = pd.read_csv(filename)
 
     df["timestamp"] = df["timestamp"] - df["timestamp"].min()
-    df.drop(df[df.timestamp > max_timestamp].index, inplace=True)
-    df.drop(df[df.timestamp < min_timestamp].index, inplace=True)
+    if min_timestamp:
+        df.drop(df[df.timestamp < min_timestamp].index, inplace=True)
+    if max_timestamp:
+        df.drop(df[df.timestamp > max_timestamp].index, inplace=True)
 
     df.replace(load_node_names(), inplace=True)
 
@@ -69,12 +81,23 @@ def ecdf_plot(
 
 
 def time_plot(
-    df, x: str, y: str, hue: str | None, ylabel: str, show: bool, filename: str
+    df,
+    x: str,
+    y: str,
+    hue: str | None,
+    ylabel: str,
+    ylim: tuple[float, float] | None,
+    title: str | None,
+    show: bool,
+    filename: str,
 ):
     fig, ax = plt.subplots()
     sns.lineplot(df, x=x, y=y, hue=hue, ax=ax)
     ax.set_ylabel(ylabel)
-    ax.set_title("")
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    if title is not None:
+        ax.set_title(title)
     fig.suptitle("")
     if show:
         plt.show(block=False)

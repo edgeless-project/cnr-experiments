@@ -5,15 +5,16 @@ import os
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
+import numpy as np
 from utils import (
     time_plot,
     ecdf_plot,
-    load_dataset,
     map_physical_to_workflow_id,
-    load_node_names,
+    show_or_save,
 )
 from sys import float_info
 
+MAX_WORKFLOWS = 10
 PERFORMANCE_SAMPLES = os.environ.get(
     "PERFORMANCE_SAMPLES", "dataset/performance_samples.csv"
 )
@@ -87,6 +88,8 @@ for wid, timestamps in timestamps.items():
     if (delivered + lost) > 0:
         losses.append([wid, float(lost) / (delivered + lost)])
 
+for wid, loss_ratio in losses:
+    print("{}: {}".format(wid, loss_ratio))
 df_losses = pd.DataFrame(losses, columns=["wid", "loss"])
 
 ecdf_plot(
@@ -98,21 +101,57 @@ ecdf_plot(
 )
 
 df_latencies = pd.DataFrame(latencies, columns=["wid", "timestamp", "latency"])
+df_latencies["timestamp_bin"] = (df_latencies["timestamp"] / 60).apply(np.floor)
+
+df_throughput = pd.DataFrame(
+    df_latencies.groupby("wid")["timestamp_bin"].value_counts()
+)
+fig, ax = plt.subplots()
+sns.lineplot(
+    df_throughput,
+    x="timestamp_bin",
+    y="count",
+    hue="wid",
+    ax=ax,
+)
+ax.set_ylabel("Throughput (successful transactions/minute)")
+ax.set_title("")
+fig.suptitle("")
+show_or_save("{}-workflow-throghput".format(basename))
 
 wids = list(df_latencies["wid"].unique())
-selected = random.sample(wids, k=min(len(wids), 10))
+selected = random.sample(wids, k=min(len(wids), MAX_WORKFLOWS))
 
 df_latencies = df_latencies[df_latencies["wid"].isin(selected)]
+
+bottom = df_latencies["latency"].quantile(0.01)
+top = df_latencies["latency"].quantile(0.99)
 
 time_plot(
     df_latencies,
     x="timestamp",
     y="latency",
     ylabel="Latency (s)",
+    ylim=[bottom, top],
+    title=None,
     hue="wid",
     show=SHOW,
-    filename="{}-workflow-latency".format(basename),
+    filename="{}-workflow-all-latency".format(basename),
 )
+
+for wid in wids:
+    time_plot(
+        df_latencies.loc[df_latencies["wid"] == wid],
+        x="timestamp",
+        y="latency",
+        ylabel="Latency (s)",
+        ylim=[bottom, top],
+        title=wid,
+        hue="wid",
+        show=SHOW,
+        filename="{}-workflow-{}-latency".format(basename, wid),
+    )
+
 
 if SHOW:
     input("Press any key to continue")

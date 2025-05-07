@@ -13,7 +13,7 @@ SHOW = bool(os.environ.get("SHOW", ""))
 
 basename = os.path.basename(os.getcwd())
 
-df = load_dataset(PERFORMANCE_SAMPLES, min_timestamp=0, max_timestamp=7200)
+df = load_dataset(PERFORMANCE_SAMPLES, min_timestamp=None, max_timestamp=None)
 
 df = df[df["metric"].isin(["function_execution_time", "function_transfer_time"])]
 
