@@ -119,7 +119,7 @@ def load_node_names():
         tokens = labels.split(";")
         if len(tokens) == 3 and tokens[0] == "edge":
             node_name = tokens[2]
-        elif len(tokens) == 2 and tokens[0] == "server":
+        elif len(tokens) == 2 and tokens[0] == "core":
             node_name = tokens[1]
         else:
             node_name = node_id

@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils import box_plot, time_plot, load_dataset
+from utils import load_dataset, show_or_save
 
 HEALTH_STATUS = os.environ.get("HEALTH_STATUS", "dataset/health_status.csv")
 SHOW = bool(os.environ.get("SHOW", ""))
@@ -21,37 +20,31 @@ df["interval"] = df.groupby(["seed", "node_id"])["timestamp"].diff()
 df["tot_throughput"] = (df["rx_throughput"] + df["tx_throughput"]) / (
     df["interval"] * 1048576
 )
+df.timestamp *= 1 / 3600.0
+
+df.drop(df[df.node_id.str.contains("slices")].index, inplace=True)
 
 metrics = [
     ("proc_cpu_usage", "Process CPU usage"),
     ("load_avg_1", "Load average (1 minute)"),
     ("mem_occupancy", "Memory occupancy"),
     ("tot_throughput", "Network traffic per node (Mb/s)"),
+    ("active_power", "Active power (mW)"),
 ]
 
 for y, ylabel in metrics:
-    box_plot(
-        df,
-        x="node_id",
-        y=y,
-        ylabel=ylabel,
-        ylim=None,
-        yscale="linear",
-        hue=None,
-        show=SHOW,
-        filename="{}-{}-box".format(basename, y),
-    )
+    fig, ax = plt.subplots()
+    sns.boxplot(df, x="node_id", y=y, ax=ax)
+    ax.set_ylabel(ylabel)
+    show_or_save("{}-{}-box".format(basename, y))
 
 for y, ylabel in metrics:
-    time_plot(
-        df,
-        x="timestamp",
-        y=y,
-        ylabel=ylabel,
-        hue="node_id",
-        show=SHOW,
-        filename="{}-{}-time".format(basename, y),
-    )
+    fig, ax = plt.subplots()
+    sns.lineplot(df, x="timestamp", y=y, hue="node_id", ax=ax)
+    ax.set_xlabel("Time (h)")
+    ax.set_ylabel(ylabel)
+    fig.suptitle("")
+    show_or_save("{}-{}-time".format(basename, y))
 
 if SHOW:
     input("Press any key to continue")
