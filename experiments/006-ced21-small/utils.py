@@ -115,15 +115,12 @@ def load_node_names():
     df = pd.read_csv(CAPABILITIES)
     ret = dict()
     for _id, node_id, labels in df[["node_id", "labels"]].itertuples():
-        labels = str(labels).replace("[", "").replace("]", "")
-        tokens = labels.split(";")
-        if len(tokens) == 3 and tokens[0] == "edge":
-            node_name = tokens[2]
-        elif len(tokens) == 2 and tokens[0] == "core":
-            node_name = tokens[1]
-        else:
-            node_name = node_id
-        ret[node_id] = node_name
+        labels = str(labels).replace("[", "").replace("]", "").split(";")
+        hostname = node_id
+        for label in labels:
+            if "hostname=" in label:
+                (_token, hostname) = label.split("=")
+        ret[node_id] = hostname
     return ret
 
 
