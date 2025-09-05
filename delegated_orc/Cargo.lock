@@ -346,8 +346,11 @@ dependencies = [
  "edgeless_api",
  "edgeless_orc",
  "env_logger",
+ "futures",
  "itertools",
  "log",
+ "rand",
+ "tokio",
 ]
 
 [[package]]
