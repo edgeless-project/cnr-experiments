@@ -1,0 +1,53 @@
+{
+    "functions": [
+        {
+            "name": "trigger",
+            "class_specification": {
+                "id": "trigger",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "trigger.wasm",
+                "outputs": [
+                    "out"
+                ]
+            },
+            "output_mapping": {
+                "out": "double"
+            },
+            "annotations": {
+                "init-payload": "out_type=counter,arrival=c(100)",
+                "label_match_all": "domain=core"
+            }
+        },
+        {
+            "name": "double",
+            "class_specification": {
+                "id": "double",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "double.wasm",
+                "outputs": [
+                    "result"
+                ]
+            },
+            "output_mapping": {
+                "result": "file-log"
+            },
+            "annotations": {
+                "label_match_all": "type=edge"
+            }
+        }
+    ],
+    "resources": [
+        {
+            "name": "file-log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "output-@WF_ID.log",
+                "add-timestamp": "true"
+            }
+        }
+    ],
+    "annotations": {}
+}

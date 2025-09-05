@@ -1,0 +1,7 @@
+cli.toml
+double.wasm
+edgeless_cli
+mixer
+noop.wasm
+proxy_cli
+trigger.wasm
