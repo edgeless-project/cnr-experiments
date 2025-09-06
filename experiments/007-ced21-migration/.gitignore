@@ -5,3 +5,5 @@ mixer
 noop.wasm
 proxy_cli
 trigger.wasm
+data
+data~

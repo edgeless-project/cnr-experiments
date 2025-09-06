@@ -18,6 +18,9 @@ struct Args {
     /// Migration period, in ms
     #[arg(short, long, default_value_t = 1000)]
     period: u64,
+    /// Experiment duration, in s.
+    #[arg(short, long, default_value_t = 60)]
+    duration: u64,
     /// Name of the function instance to be migrated.
     #[arg(short, long, default_value_t = String::from("noop"))]
     function: String,
@@ -46,14 +49,19 @@ async fn main() -> anyhow::Result<()> {
     )
     .await?;
 
+    let start_time = std::time::Instant::now();
     loop {
-        let start_time = std::time::Instant::now();
+        let migration_time = std::time::Instant::now();
         let num_migrations = mixer.mix().await;
         println!(
-            "{} migrations, took {} ms",
+            "time {}, {} migrations, took {} ms",
+            start_time.elapsed().as_secs_f32(),
             num_migrations,
-            start_time.elapsed().as_millis()
+            migration_time.elapsed().as_millis()
         );
+        if start_time.elapsed().as_secs() >= args.duration {
+            return Ok(());
+        }
 
         std::thread::sleep(std::time::Duration::from_millis(args.period));
     }
