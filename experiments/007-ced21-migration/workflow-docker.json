@@ -15,7 +15,7 @@
                 "out": "double"
             },
             "annotations": {
-                "init-payload": "out_type=counter,arrival=c(100)",
+                "init-payload": "out_type=counter,arrival=c(10)",
                 "label_match_all": "domain=core"
             }
         },
