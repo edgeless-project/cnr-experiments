@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils import show_or_save, pd_set_options, load_node_names
+from utils import show_or_save
 
 DATA_DIR = os.environ.get("DATA_DIR", "data")
 SHOW = bool(os.environ.get("SHOW", ""))
