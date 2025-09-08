@@ -4,6 +4,7 @@ import pandas as pd
 import os
 import random
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import seaborn as sns
 import numpy as np
 from utils import show_or_save, map_physical_to_workflow_id
@@ -109,11 +110,20 @@ df = pd.DataFrame(
 df["timestamp_bin"] = (df["timestamp"] / 60).apply(np.floor)
 
 metrics = [
-    ("latency", "Latency (s)"),
+    ("latency", "Latency (ms)"),
 ]
 
 basename = os.path.basename(os.getcwd())
-
+replacements = {
+    "local-1": "L-1",
+    "local-100": "L-100",
+    "local-100000": "L-100k",
+    "remote-1": "R-1",
+    "remote-100": "R-100",
+    "remote-100000": "R-100k",
+}
+df.replace({"experiment": replacements}, inplace=True)
+df["latency"] = df["latency"].apply(lambda x: x * 1000)
 for num_workflow in df["num_workflows"].unique():
     for y, ylabel in metrics:
         fig, ax = plt.subplots()
@@ -124,8 +134,20 @@ for num_workflow in df["num_workflows"].unique():
             ax=ax,
             showfliers=False,
         )
+        ax.set_ylim(bottom=0.1, top=100)
         ax.set_ylabel(ylabel)
-        fig.suptitle(f"{num_workflow} workflows")
+        ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(
+            ticker.FuncFormatter(
+                lambda y, pos: (
+                    "{{:.{:1d}f}}".format(int(np.maximum(-np.log10(y), 0)))
+                ).format(y)
+            )
+        )
+        plural = ""
+        if int(num_workflow) > 1:
+            plural = "s"
+        fig.suptitle(f"{num_workflow} workflow{plural}")
         show_or_save("{}-{}-{}".format(basename, num_workflow, y))
 
 if SHOW:
