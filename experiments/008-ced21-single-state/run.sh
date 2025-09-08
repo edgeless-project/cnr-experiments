@@ -1,50 +1,53 @@
 #!/bin/bash
 
 states="local remote"
-vec_sizes="10 1000 100000"
+vec_sizes="1 1000 1000000"
+num_workflows="1"
 executables="edgeless_cli"
-regular_files="cli.toml trigger.wasm state_sim.wasm workflow-local.json workflow-redis.json"
+regular_files="cli.toml trigger.wasm state_sim.wasm workflow-local.json workflow-remote.json"
+
+if [ "$DURATION" == "" ] ; then
+    DURATION=60
+fi
 
 for executable in $executables ; do 
     if [ ! -x $executable ] ; then
         echo "cannot find executable in current directory: $executable"
+        exit 1
     fi
 done
 
 for regular_file in $regular_files ; do 
     if [ ! -r $regular_file ] ; then
         echo "cannot find file expected in current directory: $regular_file"
+        exit 1
     fi
 done
 
-./edgeless_cli workflow stop all
-
+rm workflows.csv 2> /dev/null
 for state in $states ; do
-    for vec_size in $vec_sizes ; do # XXX
-        outdir=data/$runtime-$num_workflow
+    for vec_size in $vec_sizes ; do
+        for num_workflow in $num_workflows ; do
+            outdir=data/$runtime-$num_workflow
 
-        if [ -d $outdir ] ; then
-            echo "directory $outdir already present: skipping"
-            continue
-        fi
+            echo "*************************************************"
+            echo "state $state, vec_size $vec_size, num_workflow $num_workflow"
+            echo "*************************************************"
 
-        echo "*************************************************"
-        echo "runtime $runtime, num_workflow $num_workflow"
-        echo "*************************************************"
+            sed -e -s "s/vec_size=10/vec_size=$vec_size/" \
+                workflow-$state.json >  workflow.json
 
-        RUST_LOG=info ./edgeless_benchmark \
-            -w "json-spec;workflow-$runtime.json" \
-            -c http://$IP:7001 \
-            --arrival-model incr-and-keep \
-            --warmup $num_workflow -i 1 -d $num_workflow -k
+            ./edgeless_cli workflow stop all
 
-        ./mixer -c http://$IP:7001 -f double -l 'type=edge' -d 100 > mixer.log
+            for (( i = 0 ; i < $num_workflow ; i++ )) ; do
+                WF_ID=$(./edgeless_cli workflow start workflow.json)
+                echo "$WF_ID,$state,$vec_size,$num_workflow" >> workflows.csv
+            done
 
-        mkdir -p $outdir
-        mv mixer.log $outdir
-
-        ./edgeless_cli workflow stop all
-
-        read -n 1 -p "move the output files to $outdir, then restart the orchestrator, and press a key..."
+            sleep $DURATION
+        done
     done
 done
+
+./edgeless_cli workflow stop all
+rm workflow.json 2> /dev/null

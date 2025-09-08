@@ -1,33 +1,31 @@
-# 007-ced21-migration
+# 008-ced21-single-state
 
 ## Scenario
 
 5 "edge" nodes with `RUST_WASM` and `CONTAINER` run-times, 1 "core" node with
 a file-log resource and a `RUST_WASM` run-time.
 
-Four batches:
+All possible combinations of:
 
-- 1 workflow with WASM vs. CONTAINER function
-- same with 10 workflows
+- state type: local vs. remote (on Redis via the `redis` resource in the "core" node)
+- state size: vectors of f32 numbers of size 10, 100, and 10000
+- number of workflows: 1 vs. 20
 
-The workflows generate 100 messages per second each.
-
-The `mixer` utility is used to migrate every 1 seconds all the function 
-instances from their hosting node to another randomly.
+The workflows generate 10 messages per second each.
 
 ## Repeatability
 
 Requirements:
 
-- WASM functions: `double.wasm`, `trigger.wasm`
+- WASM functions: `state_sim.wasm` (this repo), `trigger.wasm` (main repo,
+  version 0.2)
 
 ## Dataset
 
 To replicate the experiments there must be a configured EDGELESS cluster.
 
-The scripts assume that the orchestrator and controller run on the same host
-that drives the experiments, which can be run with (follow interactive
-instructions during execution):
+Assuming that there is a configured edgeless_cli in the current working
+director, just hit:
 
 ```shell
 ./run.sh
@@ -39,15 +37,11 @@ The datasets obtained at CNR can be downloaded with:
 ../../scripts/download-artifacts.sh
 ```
 
-After download, you can plot some basic metrics with the following scripts
-(which produce PDF files):
+After download, you can plot some basic metrics with the following script
+(which produces PDF files):
 
 ```shell
-python node_stats.py
-```
-
-```shell
-python msg_loss.py
+python latency.py
 ```
 
 If needed, the required Python packages can be installed with

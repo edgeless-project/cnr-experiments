@@ -12,12 +12,14 @@ echo "your IP is $IP"
 for executable in $executables ; do 
     if [ ! -x $executable ] ; then
         echo "cannot find executable in current directory: $executable"
+        exit 1
     fi
 done
 
 for regular_file in $regular_files ; do 
     if [ ! -r $regular_file ] ; then
         echo "cannot find file expected in current directory: $regular_file"
+        exit 1
     fi
 done
 

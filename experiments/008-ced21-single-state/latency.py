@@ -25,8 +25,8 @@ basename = os.path.basename(os.getcwd())
 workflows = {}
 with open(WORKFLOWS_CSV, "r") as infile:
     for line in infile:
-        (wf_id, experiment, size) = line.rstrip().split(",")
-        workflows[wf_id] = [experiment, size]
+        (wf_id, experiment, size, num) = line.rstrip().split(",")
+        workflows[wf_id] = [f"{experiment}-{size}", num]
 
 pid_to_wid = map_physical_to_workflow_id(MAPPING_TO_INSTANCE_ID)
 timestamps = {}
@@ -89,19 +89,23 @@ for wid, timestamps in timestamps.items():
             continue
 
         assert wid in workflows
-        experiment = "-".join(workflows[wid])
+        experiment = workflows[wid][0]
+        num_workflows = workflows[wid][1]
 
         if tbegin is not None and tend is not None:
-            latencies.append([wid, tbegin, tend - tbegin, experiment])
+            latencies.append([wid, tbegin, tend - tbegin, experiment, num_workflows])
             delivered += 1
         else:
             lost += 1
     if (delivered + lost) > 0:
         losses.append([wid, float(lost) / (delivered + lost)])
 
-print(losses)
+for wf_id, loss in losses:
+    print("{}, loss {}".format(wf_id, loss))
 
-df = pd.DataFrame(latencies, columns=["wid", "timestamp", "latency", "experiment"])
+df = pd.DataFrame(
+    latencies, columns=["wid", "timestamp", "latency", "experiment", "num_workflows"]
+)
 df["timestamp_bin"] = (df["timestamp"] / 60).apply(np.floor)
 
 metrics = [
@@ -109,11 +113,19 @@ metrics = [
 ]
 
 basename = os.path.basename(os.getcwd())
-for y, ylabel in metrics:
-    fig, ax = plt.subplots()
-    sns.boxplot(df, x="experiment", y=y, ax=ax)
-    ax.set_ylabel(ylabel)
-    show_or_save("{}-{}".format(basename, y))
+
+for num_workflow in df["num_workflows"].unique():
+    for y, ylabel in metrics:
+        fig, ax = plt.subplots()
+        sns.boxplot(
+            df[df["num_workflows"] == num_workflow],
+            x="experiment",
+            y=y,
+            ax=ax,
+            showfliers=False,
+        )
+        ax.set_ylabel(ylabel)
+        show_or_save("{}-{}-{}".format(basename, num_workflow, y))
 
 if SHOW:
     input("Press any key to continue")
