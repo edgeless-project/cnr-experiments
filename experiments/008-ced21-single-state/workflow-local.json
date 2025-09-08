@@ -1,0 +1,45 @@
+{
+    "functions": [
+        {
+            "name": "trigger",
+            "class_specification": {
+                "id": "trigger",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "trigger.wasm",
+                "outputs": [
+                    "out"
+                ]
+            },
+            "output_mapping": {
+                "out": "state_sim"
+            },
+            "annotations": {
+                "init-payload": "out_type=counter,arrival=c(100),log=true",
+                "label_match_all": "domain=core"
+            }
+        },
+        {
+            "name": "state_sim",
+            "class_specification": {
+                "id": "state_sim",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "state_sim.wasm",
+                "outputs": [
+                    "out",
+                    "state"
+                ]
+            },
+            "output_mapping": {
+                "out": "trigger"
+            },
+            "annotations": {
+                "init-payload": "local=true,vec_size=10",
+                "label_match_all": "type=edge"
+            }
+        }
+    ],
+    "resources": [],
+    "annotations": {}
+}
