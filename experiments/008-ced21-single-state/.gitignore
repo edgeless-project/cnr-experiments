@@ -4,3 +4,4 @@ proxy_cli
 *.wasm
 data
 data~
+workflow.json

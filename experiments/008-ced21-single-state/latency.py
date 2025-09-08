@@ -125,6 +125,7 @@ for num_workflow in df["num_workflows"].unique():
             showfliers=False,
         )
         ax.set_ylabel(ylabel)
+        fig.suptitle(f"{num_workflow} workflows")
         show_or_save("{}-{}-{}".format(basename, num_workflow, y))
 
 if SHOW:

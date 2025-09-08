@@ -1,8 +1,8 @@
 #!/bin/bash
 
 states="local remote"
-vec_sizes="1 1000 1000000"
-num_workflows="1"
+vec_sizes="1 100 100000"
+num_workflows="1 20"
 executables="edgeless_cli"
 regular_files="cli.toml trigger.wasm state_sim.wasm workflow-local.json workflow-remote.json"
 
@@ -25,16 +25,16 @@ for regular_file in $regular_files ; do
 done
 
 rm workflows.csv 2> /dev/null
-for state in $states ; do
-    for vec_size in $vec_sizes ; do
-        for num_workflow in $num_workflows ; do
+for num_workflow in $num_workflows ; do
+    for state in $states ; do
+        for vec_size in $vec_sizes ; do
             outdir=data/$runtime-$num_workflow
 
             echo "*************************************************"
             echo "state $state, vec_size $vec_size, num_workflow $num_workflow"
             echo "*************************************************"
 
-            sed -e -s "s/vec_size=10/vec_size=$vec_size/" \
+            sed -e "s/vec_size=10/vec_size=$vec_size/" \
                 workflow-$state.json >  workflow.json
 
             ./edgeless_cli workflow stop all
