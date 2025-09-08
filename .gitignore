@@ -10,3 +10,4 @@ experiments/006-ced21-small/edgeless_inabox.log
 experiments/006-ced21-small/node.toml
 experiments/006-ced21-small/orchestrator.toml
 *.save
+rust_functions/state_sim/state_sim.wasm
