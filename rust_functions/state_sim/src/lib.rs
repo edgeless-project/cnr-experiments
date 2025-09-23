@@ -6,17 +6,24 @@ use edgeless_function::*;
 
 struct StateSimFunction;
 
+enum Operation {
+    Increment,
+    Sin,
+}
+
 struct Conf {
-    // True: the state is local. False: it is read from "state".
+    /// True: the state is local. False: it is read from "state".
     is_local: bool,
-    // Vector size, in f32.
+    /// Vector size, in f32.
     vec_size: usize,
+    /// Operation type.
+    operation: Operation,
 }
 
 struct State {
-    // Pseudo-random number generator.
+    /// Pseudo-random number generator.
     lcg: edgeless_function::lcg::Lcg,
-    // State (a vector of floats).
+    /// State (a vector of floats).
     vector: Vec<f32>,
 }
 
@@ -35,10 +42,19 @@ impl EdgeFunction for StateSimFunction {
                     edgeless_function::lcg::random_vector(&mut state.lcg, conf.vec_size);
                 std::mem::swap(&mut state.vector, &mut new_vector);
             } else {
-                // Non-first-time: increment by one each element.
-                for elem in &mut state.vector {
-                    *elem += 1.0_f32;
-                }
+                // Non-first-time: perform operation.
+                match &conf.operation {
+                    Operation::Increment => {
+                        for elem in &mut state.vector {
+                            *elem += 1.0_f32;
+                        }
+                    }
+                    Operation::Sin => {
+                        for elem in &mut state.vector {
+                            *elem = elem.sin();
+                        }
+                    }
+                };
             }
         } else {
             // Retrieve the state.
@@ -91,7 +107,7 @@ impl EdgeFunction for StateSimFunction {
     }
 
     // example of payload:
-    // local=true,vec_size=1000
+    // local=true,vec_size=1000,operation=sin
     fn handle_init(payload: Option<&[u8]>, _serialized_state: Option<&[u8]>) {
         // edgeless_function::init_logger();
 
@@ -105,9 +121,16 @@ impl EdgeFunction for StateSimFunction {
             .parse::<usize>()
             .unwrap_or(100);
 
+        let operation = match arguments.get("operation").unwrap_or(&"") {
+            &"sin" => Operation::Sin,
+            &"incr" => Operation::Increment,
+            _ => Operation::Increment,
+        };
+
         let _ = CONF.set(Conf {
             is_local: local,
             vec_size,
+            operation,
         });
 
         let lcg = edgeless_function::lcg::Lcg::new(42);
