@@ -191,11 +191,11 @@ for y, ylabel in metrics:
 new_df = pd.DataFrame(
     df.groupby(["label", "num_workflows"], as_index=False).agg("count")
 )
-new_df["norm_tpt"] = new_df["wid"] / (new_df["num_workflows"] * 120.0)
+new_df["norm_tpt"] = new_df["wid"] / 120.0
 
 fig, ax = plt.subplots()
 sns.barplot(new_df, x="label", y="norm_tpt", hue="num_workflows")
-ax.set_ylabel("Workflow throughput (messages/s)")
+ax.set_ylabel("Total throughput (messages/s)")
 plt.xticks(rotation=45)
 show_or_save("{}-throughput".format(basename))
 
