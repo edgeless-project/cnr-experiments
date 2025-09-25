@@ -43,8 +43,9 @@ After download, you can plot some basic metrics with the following scripts
 (which produce PDF files):
 
 ```shell
-python latency.py
+python workflow_latency.py
 python node_health.py
+python performance_samples.py
 ```
 
 If needed, the required Python packages can be installed with
