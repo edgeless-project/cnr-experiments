@@ -69,7 +69,7 @@ for state in $states ; do
                 fi
                 for node in "${nodes[@]}" ; do
                     sed -e "s/e(100)/e($duration)/" workflow.json |\
-                        sed -e "s/type=edge/hostname=$node/" workflow.json \
+                        sed -e "s/type=edge/hostname=$node/" \
                         > workflow-node.json
 
                     WF_ID=$(./edgeless_cli workflow start workflow-node.json)

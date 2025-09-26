@@ -90,11 +90,30 @@ metrics = [
     ("active_power", "Active power (mW)"),
 ]
 
+order = [
+    "L-10",
+    "L-1k",
+    "L-100k",
+    "R-10",
+    "R-1k",
+    "R-100k",
+]
+
 for node in df["node"].unique():
     for y, ylabel in metrics:
         fig, ax = plt.subplots()
-        sns.boxplot(df[df["node"] == node], x="label", y=y, hue="num_workflows", ax=ax)
+        sns.boxplot(
+            df[df["node"] == node],
+            x="label",
+            y=y,
+            hue="num_workflows",
+            ax=ax,
+            order=order,
+        )
         ax.set_ylabel(ylabel)
+        if y == "tot_throughput":
+            ax.set_ylim(bottom=0.01, top=10)
+            ax.set_yscale("log")
         plt.xticks(rotation=45)
         fig.suptitle(f"{node}")
         show_or_save("{}-{}-{}".format(basename, y, node))

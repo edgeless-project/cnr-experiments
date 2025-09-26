@@ -141,13 +141,24 @@ with open("workflow-ranges.csv", "w") as outfile:
     for label, (begin, end) in time_range.items():
         outfile.write(f"{begin + min_timestamp},{end+min_timestamp},{label}\n")
 
+order = [
+    "L-10",
+    "L-1k",
+    "L-100k",
+    "R-10",
+    "R-1k",
+    "R-100k",
+]
+
 losses_df = pd.DataFrame(
     losses,
     columns=["wid", "experiment", "size", "num_workflows", "loss"],
 )
 relabel(losses_df)
 fig, ax = plt.subplots()
-sns.barplot(losses_df, x="label", y="loss", hue="num_workflows", errorbar=None)
+sns.barplot(
+    losses_df, x="label", y="loss", hue="num_workflows", errorbar=None, order=order
+)
 ax.set_ylabel("Loss ratio")
 plt.xticks(rotation=45)
 show_or_save("{}-loss".format(basename))
@@ -168,12 +179,7 @@ df["latency"] = df["latency"].apply(lambda x: x * 1000)
 for y, ylabel in metrics:
     fig, ax = plt.subplots()
     sns.boxplot(
-        df,
-        x="label",
-        y=y,
-        hue="num_workflows",
-        ax=ax,
-        showfliers=False,
+        df, x="label", y=y, hue="num_workflows", ax=ax, showfliers=False, order=order
     )
     ax.set_ylim(bottom=0.1, top=100)
     ax.set_ylabel(ylabel)
@@ -194,7 +200,7 @@ new_df = pd.DataFrame(
 new_df["norm_tpt"] = new_df["wid"] / 120.0
 
 fig, ax = plt.subplots()
-sns.barplot(new_df, x="label", y="norm_tpt", hue="num_workflows")
+sns.barplot(new_df, x="label", y="norm_tpt", hue="num_workflows", order=order)
 ax.set_ylabel("Total throughput (messages/s)")
 plt.xticks(rotation=45)
 show_or_save("{}-throughput".format(basename))

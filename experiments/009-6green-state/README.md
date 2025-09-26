@@ -10,7 +10,7 @@ Experiments are run for all possible combinations of:
 - state type: stateful vs. stateless (on Redis via the `redis` resource in the
   "core" node)
 - state: vectors of f32 numbers of size 10, 1000, and 100000
-- number of workflows: 50
+- number of workflows: 20 vs. 200
 
 Each experiment lasts 120 seconds.
 
