@@ -118,5 +118,24 @@ for node in df["node"].unique():
         fig.suptitle(f"{node}")
         show_or_save("{}-{}-{}".format(basename, y, node))
 
+
+for num_workflows in df["num_workflows"].unique():
+    agg = (
+        df[df["num_workflows"] == num_workflows][
+            ["node_id", "num_workflows", "label", "proc_cpu_usage", "active_power"]
+        ]
+        .groupby(["node_id", "num_workflows", "label"])
+        .agg("mean")
+    )
+
+    fig, ax = plt.subplots()
+    sns.scatterplot(
+        agg, x="proc_cpu_usage", y="active_power", hue="label", hue_order=order
+    )
+    ax.set_xlabel("Process CPU usage")
+    ax.set_ylabel("Active power (mW)")
+    fig.suptitle(f"{num_workflows} workflows")
+    show_or_save("{}-cpu_vs_power-{}".format(basename, num_workflows))
+
 if SHOW:
     input("Press any key to continue")
