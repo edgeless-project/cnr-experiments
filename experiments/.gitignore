@@ -3,3 +3,4 @@ edgeless_benchmark
 *.dat
 *.pdf
 *.png
+data/
