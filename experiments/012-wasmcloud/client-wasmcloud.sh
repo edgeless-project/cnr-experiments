@@ -13,7 +13,7 @@ if [ "$OPERATION" == "" ] ; then
     OPERATION=sin
 fi
 if [ "$INTER_TIME" == "" ] ; then
-    INTER_TIME=0
+    INTER_TIME=0.1
 fi
 if [ "$OUTPUT_DIR" == "" ] ; then
     OUTPUT_DIR=data/wasm-cloud/$(date +%s)
@@ -37,6 +37,8 @@ while true ; do
     fi
 
     echo "$timestamp,$NAME,$SIZE,$OPERATION,$INTER_TIME,$cnt,$latency" >> $outfile
+
+    sleep $INTER_TIME
     
     cnt=$((cnt+1))
 done
