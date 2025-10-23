@@ -1,7 +1,6 @@
 #!/bin/bash
 
-vec_sizes="100 10000 1000000"
-vec_sizes="10 100"
+vec_sizes="1000 100000 1000000"
 
 if [ "$BATCH_SIZE" == "" ] ; then
     BATCH_SIZE=5
@@ -10,7 +9,7 @@ if [ "$NUM_BATCHES" == "" ] ; then
     NUM_BATCHES=10
 fi
 if [ "$BATCH_DURATION" == "" ] ; then
-    BATCH_DURATION=10
+    BATCH_DURATION=60
 fi
 if [ "$INTER_TIME" == "" ] ; then
     INTER_TIME=0.1

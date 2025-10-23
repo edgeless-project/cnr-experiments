@@ -6,10 +6,15 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 
-HEALTH_STATUS = os.environ.get("HEALTH_STATUS", "data/wasmcloud/dataset/health_status.csv")
+HEALTH_STATUS = os.environ.get(
+    "HEALTH_STATUS", "data/wasmcloud/dataset/health_status.csv"
+)
 CAPABILITIES = os.environ.get("CAPABILITIES", "data/wasmcloud/dataset/capabilities.csv")
-WASM_CLOUD_LATENCIES = os.environ.get("WASM_CLOUD_LATENCIES", "data/wasmcloud/latencies.csv")
+WASM_CLOUD_LATENCIES = os.environ.get(
+    "WASM_CLOUD_LATENCIES", "data/wasmcloud/latencies.csv"
+)
 IMAGE_TYPE = os.environ.get("IMAGE_TYPE", "pdf")
+
 
 def load_node_names(capabilities: str):
     df = pd.read_csv(capabilities)
@@ -23,6 +28,7 @@ def load_node_names(capabilities: str):
         ret[node_id] = hostname
     return ret
 
+
 basename = os.path.basename(os.getcwd())
 
 pd.set_option("display.show_dimensions", False)
@@ -32,7 +38,13 @@ pd.set_option("display.max_colwidth", None)
 df = pd.read_csv(WASM_CLOUD_LATENCIES)
 time_ranges = []
 for size in df["size"].unique():
-    time_ranges.append((df[df["size"] == size].min().timestamp,df[df["size"] == size].max().timestamp,size))
+    time_ranges.append(
+        (
+            df[df["size"] == size].min().timestamp,
+            df[df["size"] == size].max().timestamp,
+            size,
+        )
+    )
 
 df = pd.read_csv(HEALTH_STATUS)
 
@@ -74,19 +86,33 @@ df.replace(
 df.dropna(subset=["experiment"], inplace=True)
 
 for experiment in df["experiment"].unique():
-    df.loc[df["experiment"] == experiment, "timestamp"] = df.loc[df["experiment"] == experiment, "timestamp"] - df[df["experiment"] == experiment]["timestamp"].min()
-    
+    df.loc[df["experiment"] == experiment, "timestamp"] = (
+        df.loc[df["experiment"] == experiment, "timestamp"]
+        - df[df["experiment"] == experiment]["timestamp"].min()
+    )
+
+bin_duration = 10
+df["timestamp_bin"] = (df["timestamp"] / bin_duration).apply(np.floor)
 
 metrics = [
-    ("proc_cpu_usage", "Process CPU usage"),
+    ("load_avg_1", "Average load"),
     ("mem_occupancy", "Memory occupancy"),
     ("tot_throughput", "Network traffic per node (Mb/s)"),
 ]
 
 for y, ylabel in metrics:
     fig, ax = plt.subplots()
-    sns.lineplot(df, x="timestamp", y=y, hue="experiment",ax=ax)
+    sns.lineplot(
+        df,
+        x="timestamp_bin",
+        y=y,
+        hue="experiment",
+        errorbar=("ci", 95),
+        ax=ax,
+        estimator="mean",
+    )
     ax.set_xlabel("Time (s)")
+    ax.set_xlim(left=0.0, right=60.0)
     ax.set_ylabel(ylabel)
     fig.suptitle("")
-    plt.savefig("{}-{}-time.{}".format(basename,y, IMAGE_TYPE))
+    plt.savefig("{}-{}-time.{}".format(basename, y, IMAGE_TYPE))
