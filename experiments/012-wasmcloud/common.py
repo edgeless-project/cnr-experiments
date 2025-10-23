@@ -94,6 +94,7 @@ def plot_node_health(df: pd.DataFrame, experiment_label: str, time_ranges: list)
             errorbar=("ci", 95),
             ax=ax,
             estimator="mean",
+            palette="colorblind",
         )
         ax.set_xlabel("Time (s)")
         ax.set_xlim(left=0.0, right=60.0)
@@ -129,6 +130,7 @@ def plot_latencies(df: pd.DataFrame, experiment_label: str):
             errorbar=("ci", 95),
             ax=ax,
             estimator="mean",
+            palette="colorblind",
         )
         ax.set_xlabel("Time (s)")
         ax.set_ylabel(ylabel)
@@ -148,6 +150,7 @@ def plot_latencies(df: pd.DataFrame, experiment_label: str):
         errorbar=("ci", 95),
         ax=ax,
         estimator="count",
+        palette="colorblind",
     )
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Throughput (messages/s)")

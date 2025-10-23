@@ -55,7 +55,6 @@ for size in df["size"].unique():
             size,
         )
     )
-print(time_ranges)
 
 df = pd.read_csv(HEALTH_STATUS)
 
