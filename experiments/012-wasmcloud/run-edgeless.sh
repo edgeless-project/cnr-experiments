@@ -1,7 +1,6 @@
 #!/bin/bash
 
 vec_sizes="1000 100000 1000000"
-vec_sizes="1000 1000000"
 
 if [ "$BATCH_SIZE" == "" ] ; then
     BATCH_SIZE=5

@@ -96,7 +96,7 @@ def plot_node_health(df: pd.DataFrame, experiment_label: str, time_ranges: list)
             estimator="mean",
         )
         ax.set_xlabel("Time (s)")
-        # ax.set_xlim(left=0.0, right=60.0)
+        ax.set_xlim(left=0.0, right=60.0)
         ax.set_ylabel(ylabel)
         fig.suptitle("")
         plt.savefig("{}-{}-{}.{}".format(basename, y, experiment_label, IMAGE_TYPE))
