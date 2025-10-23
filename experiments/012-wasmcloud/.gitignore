@@ -1,1 +1,5 @@
 hello
+edgeless_cli
+proxy_cli
+*.wasm
+cli.toml

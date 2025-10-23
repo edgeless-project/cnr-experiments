@@ -53,7 +53,7 @@ for y, ylabel in metrics:
     ax.set_ylabel(ylabel)
     ax.set_xlim(left=0.0, right=60.0)
     fig.suptitle("")
-    plt.savefig("{}-{}-time.{}".format(basename, y, IMAGE_TYPE))
+    plt.savefig("{}-{}-wasmcloud.{}".format(basename, y, IMAGE_TYPE))
 
 grouped = df.groupby(["timestamp_bin", "size"])["latency"].count().to_frame()
 grouped["latency"] /= bin_duration
@@ -72,4 +72,4 @@ ax.set_xlabel("Time (s)")
 ax.set_ylabel("Throughput (messages/s)")
 ax.set_xlim(left=0.0, right=60.0)
 fig.suptitle("")
-plt.savefig("{}-throughput-time.{}".format(basename, IMAGE_TYPE))
+plt.savefig("{}-throughput-wasmcloud.{}".format(basename, IMAGE_TYPE))
