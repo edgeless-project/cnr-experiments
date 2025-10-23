@@ -2,12 +2,8 @@
 
 import pandas as pd
 import os
-import random
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import seaborn as sns
-import numpy as np
 from sys import float_info
+from common import plot_latencies, map_physical_to_workflow_id
 
 MAPPING_TO_INSTANCE_ID = os.environ.get(
     "MAPPING_TO_INSTANCE_ID", "data/edgeless/dataset/mapping_to_instance_id.csv"
@@ -16,21 +12,7 @@ WORKFLOWS_CSV = os.environ.get("WORKFLOWS_CSV", "data/edgeless/workflows.csv")
 PERFORMANCE_SAMPLES = os.environ.get(
     "PERFORMANCE_SAMPLES", "data/edgeless/dataset/performance_samples.csv"
 )
-IMAGE_TYPE = os.environ.get("IMAGE_TYPE", "pdf")
-SHOW = bool(os.environ.get("SHOW", ""))
 
-
-def map_physical_to_workflow_id(input_file: str):
-    df = pd.read_csv(input_file)
-    ret = dict()
-    for _id, workflow_id, physical_id in df[
-        ["workflow_id", "physical_id"]
-    ].itertuples():
-        ret[physical_id] = workflow_id
-    return ret
-
-
-basename = os.path.basename(os.getcwd())
 
 workflows = {}
 with open(WORKFLOWS_CSV, "r") as infile:
@@ -109,54 +91,4 @@ for wf_id, loss in losses:
 
 df = pd.DataFrame(latencies, columns=["wid", "timestamp", "latency", "size"])
 
-for size in df["size"].unique():
-    df.loc[df["size"] == size, "timestamp"] = (
-        df.loc[df["size"] == size, "timestamp"]
-        - df[df["size"] == size]["timestamp"].min()
-    )
-
-
-bin_duration = 10
-df["timestamp_bin"] = (df["timestamp"] / bin_duration).apply(np.floor)
-
-metrics = [
-    ("latency", "Latency (ms)"),
-]
-
-df["latency"] *= 1000.0
-
-for y, ylabel in metrics:
-    fig, ax = plt.subplots()
-    sns.lineplot(
-        df,
-        x="timestamp_bin",
-        y=y,
-        hue="size",
-        errorbar=("ci", 95),
-        ax=ax,
-        estimator="mean",
-    )
-    ax.set_ylabel(ylabel)
-    # ax.set_xlim(left=0.0, right=60.0)
-    # ax.set_yscale("log")
-    fig.suptitle("")
-    plt.savefig("{}-{}-edgeless.{}".format(basename, y, IMAGE_TYPE))
-
-grouped = df.groupby(["timestamp_bin", "size"])["latency"].count().to_frame()
-grouped["latency"] /= bin_duration
-
-fig, ax = plt.subplots()
-sns.lineplot(
-    grouped,
-    x="timestamp_bin",
-    y="latency",
-    hue="size",
-    errorbar=("ci", 95),
-    ax=ax,
-    estimator="count",
-)
-ax.set_xlabel("Time (s)")
-ax.set_ylabel("Throughput (messages/s)")
-# ax.set_xlim(left=0.0, right=60.0)
-fig.suptitle("")
-plt.savefig("{}-throughput-edgeless.{}".format(basename, IMAGE_TYPE))
+plot_latencies(df, "edgeless")
