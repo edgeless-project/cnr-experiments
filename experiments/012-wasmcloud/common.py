@@ -9,6 +9,14 @@ import seaborn as sns
 IMAGE_TYPE = os.environ.get("IMAGE_TYPE", "pdf")
 
 
+def pp_experiment(label: str):
+    if label == "edgeless":
+        return "EDGELESS"
+    elif label == "wasmcloud":
+        return "wasmCloud"
+    return label
+
+
 def load_node_names(capabilities: str):
     df = pd.read_csv(capabilities)
     ret = dict()
@@ -99,7 +107,7 @@ def plot_node_health(df: pd.DataFrame, experiment_label: str, time_ranges: list)
         ax.set_xlabel("Time (s)")
         ax.set_xlim(left=0.0, right=60.0)
         ax.set_ylabel(ylabel)
-        fig.suptitle("")
+        fig.suptitle(pp_experiment(experiment_label))
         plt.savefig("{}-{}-{}.{}".format(basename, y, experiment_label, IMAGE_TYPE))
 
 
@@ -135,7 +143,7 @@ def plot_latencies(df: pd.DataFrame, experiment_label: str):
         ax.set_xlabel("Time (s)")
         ax.set_ylabel(ylabel)
         ax.set_xlim(left=0.0, right=60.0)
-        fig.suptitle("")
+        fig.suptitle(pp_experiment(experiment_label))
         plt.savefig("{}-{}-{}.{}".format(basename, y, experiment_label, IMAGE_TYPE))
 
     grouped = df.groupby(["timestamp_bin", "size"])["latency"].count().to_frame()
@@ -155,5 +163,5 @@ def plot_latencies(df: pd.DataFrame, experiment_label: str):
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Throughput (messages/s)")
     ax.set_xlim(left=0.0, right=60.0)
-    fig.suptitle("")
+    fig.suptitle(pp_experiment(experiment_label))
     plt.savefig("{}-throughput-{}.{}".format(basename, experiment_label, IMAGE_TYPE))
