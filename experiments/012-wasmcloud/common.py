@@ -83,7 +83,9 @@ def plot_node_health(df: pd.DataFrame, experiment_label: str, time_ranges: list)
         )
 
     bin_duration = 10
-    df["timestamp_bin"] = (df["timestamp"] / bin_duration).apply(np.floor)
+    df["timestamp_bin"] = bin_duration * (df["timestamp"] / bin_duration).apply(
+        np.floor
+    )
 
     metrics = [
         ("load_avg_1", "Average load"),
@@ -121,7 +123,9 @@ def plot_latencies(df: pd.DataFrame, experiment_label: str):
     df["latency"] *= 1000.0
 
     bin_duration = 10
-    df["timestamp_bin"] = (df["timestamp"] / bin_duration).apply(np.floor)
+    df["timestamp_bin"] = bin_duration * (df["timestamp"] / bin_duration).apply(
+        np.floor
+    )
 
     metrics = [
         ("latency", "Application latency (ms)"),
