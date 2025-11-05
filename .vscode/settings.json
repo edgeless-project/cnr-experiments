@@ -1,0 +1,22 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "**/function.json"
+            ],
+            "url": "../edgeless/schemas/function_class_schema.json"
+        },
+        {
+            "fileMatch": [
+                "**/workflow.json"
+            ],
+            "url": "../edgeless/schemas/workflow_schema.json"
+        }
+    ],
+    "rust-analyzer.linkedProjects": [
+        "delegated_orc/Cargo.toml",
+        "container_functions/Cargo.toml",
+        "rust_functions/state_sim/Cargo.toml",
+        "rust_functions/img_identify/Cargo.toml"
+    ]
+}
