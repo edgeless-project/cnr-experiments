@@ -5,7 +5,7 @@
 name = "delegated_orc"
 version = "0.0.1"
 authors = [ "Claudio Cicconetti <c.cicconetti@iit.cnr.it>" ]
-edition = "2021"
+edition = "2024"
 description = "Simple delegated orc"
 homepage = "https://edgeless-project.eu/"
 license = "MIT"
