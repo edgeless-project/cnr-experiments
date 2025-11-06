@@ -88,8 +88,10 @@ mod tests {
             base64::engine::general_purpose::STANDARD
                 .encode(data)
                 .as_bytes(),
-        );
-        println!("{:?}", res);
+        )?;
+
+        assert_eq!(200, res.width);
+        assert_eq!(125, res.height);
 
         assert!(process(&vec![]).is_err());
 
