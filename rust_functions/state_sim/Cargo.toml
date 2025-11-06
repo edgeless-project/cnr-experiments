@@ -17,7 +17,7 @@ strip = true
 name = "state_sim"
 version = "0.2.0"
 authors = ["Claudio Cicconetti <c.cicconetti@iit.cnr.it>"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 name = "state_sim"

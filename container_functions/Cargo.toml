@@ -5,8 +5,8 @@
 name = "cnr_experiments_container_functions"
 version = "1.0.0"
 authors = [ "Claudio Cicconetti <c.cicconetti@iit.cnr.it>" ]
-edition = "2021"
-rust-version = "1.76"
+edition = "2024"
+rust-version = "1.89"
 description = "Functions deployed to carry out experiments with the EDGELESS project by CNR-IIT"
 homepage = "https://edgeless-project.eu/"
 license = "MIT"
