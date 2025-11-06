@@ -17,6 +17,7 @@
         "delegated_orc/Cargo.toml",
         "container_functions/Cargo.toml",
         "rust_functions/state_sim/Cargo.toml",
-        "rust_functions/img_identify/Cargo.toml"
+        "rust_functions/img_identify/Cargo.toml",
+        "viewer/Cargo.toml"
     ]
 }
