@@ -1,11 +1,10 @@
 {
-    "id": "img_identify",
+    "id": "img_scale",
     "function_type": "RUST_WASM",
     "version": "0.1",
     "build": "Cargo.toml",
     "outputs": [
-        "info",
-        "forward",
+        "out",
         "err"
     ]
 }
