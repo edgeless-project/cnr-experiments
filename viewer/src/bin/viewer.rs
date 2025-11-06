@@ -1,13 +1,14 @@
 use actix_multipart::Multipart;
 use actix_web::mime;
 use actix_web::{
+    App, HttpRequest, HttpResponse, HttpServer, Responder,
     http::header::{self, ContentType},
-    web, App, HttpRequest, HttpResponse, HttpServer, Responder,
+    web,
 };
 use bytes::Bytes;
 use futures_util::StreamExt;
-use image::codecs::jpeg::JpegEncoder;
 use image::ImageFormat;
+use image::codecs::jpeg::JpegEncoder;
 use once_cell::sync::Lazy;
 use std::{
     sync::{Arc, Mutex},
@@ -24,6 +25,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(index))
+            .route("/post", web::post().to(post))
             .route("/upload", web::post().to(upload))
             .route("/stream", web::get().to(stream))
     })
@@ -40,11 +42,24 @@ async fn index() -> impl Responder {
             <body>
                 <h1>Live Stream</h1>
                 <img src="/stream" />
-                <img src="/stream" />
             </body>
             </html>
         "#,
     )
+}
+
+async fn post(mut payload: web::Payload) -> impl Responder {
+    let mut data = web::BytesMut::new();
+    while let Some(Ok(chunk)) = payload.next().await {
+        data.extend_from_slice(&chunk);
+    }
+
+    let image_data = data.freeze();
+
+    let mut frame = LAST_FRAME.lock().unwrap();
+    *frame = Some(image_data);
+
+    return HttpResponse::Ok().body("Image uploaded");
 }
 
 async fn upload(mut payload: Multipart) -> impl Responder {
