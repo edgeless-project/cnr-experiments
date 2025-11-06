@@ -12,10 +12,27 @@
             "output_mapping": {
                 "info": "info-log",
                 "err": "err-log",
-                "forward": "http-poster"
+                "forward": "img_scale"
             },
             "annotations": {
                 "init-payload": "log=true"
+            }
+        },
+        {
+            "name": "img_scale",
+            "class_specification": {
+                "id": "img_scale",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../rust_functions/img_scale/img_scale.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "err": "err-log",
+                "out": "http-poster"
+            },
+            "annotations": {
+                "init-payload": "log=true,resize_type=preserve,width=640,height=480"
             }
         }
     ],
