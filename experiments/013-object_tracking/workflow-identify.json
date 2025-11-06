@@ -1,0 +1,64 @@
+{
+    "functions": [
+        {
+            "name": "img_identify",
+            "class_specification": {
+                "id": "img_identify",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../rust_functions/img_identify/img_identify.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "info": "info-log",
+                "err": "err-log",
+                "forward": "http-poster"
+            },
+            "annotations": {
+                "init-payload": "log=true"
+            }
+        }
+    ],
+    "resources": [
+        {
+            "name": "http-ingress",
+            "class_type": "http-ingress",
+            "output_mapping": {
+                "new_request": "img_identify"
+            },
+            "configurations": {
+                "wf_id": "true",
+                "async": "true",
+                "encode_base64": "true"
+            }
+        },
+        {
+            "name": "info-log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "info.log",
+                "add-timestamp": "true"
+            }
+        },
+        {
+            "name": "err-log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "err.log",
+                "add-timestamp": "true"
+            }
+        },
+        {
+            "name": "http-poster",
+            "class_type": "http-poster",
+            "output_mapping": {},
+            "configurations": {
+                "url": "http://localhost:3000/post",
+                "decode_base64": "true"
+            }
+        }
+    ],
+    "annotations": {}
+}
