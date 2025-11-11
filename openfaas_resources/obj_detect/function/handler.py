@@ -7,7 +7,7 @@ from typing import Dict, Any, List, Optional
 from PIL import Image
 import numpy as np
 
-from ultralytics import YOLO
+from ultralytics import YOLO  # type: ignore
 
 
 # Load the YOLO model once at startup
