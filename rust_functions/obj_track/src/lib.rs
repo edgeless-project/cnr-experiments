@@ -68,18 +68,16 @@ fn draw_bbox(
 
 fn draw_paths(img: &mut image::DynamicImage, objects: &Objects, line_width: u32) {
     let mut img = img;
-    let mut all_labels = std::collections::HashSet::new();
-    for object in objects {
-        for label in object.keys() {
-            all_labels.insert(label.clone());
-        }
+
+    if objects.is_empty() {
+        return;
     }
 
-    for label in all_labels {
+    for label in objects.back().unwrap().keys() {
         let mut last_midpoint: Option<(u32, u32)> = None;
         let color = label_to_color(&label);
         for object in objects {
-            if let Some(midpoint) = object.get(&label) {
+            if let Some(midpoint) = object.get(label) {
                 if let Some(last_midpoint) = last_midpoint {
                     for offset in 0..line_width as i32 {
                         let real_offset = line_width as i32 / 2 - offset;
@@ -173,6 +171,11 @@ fn process(input: &Input, conf: &Conf) -> anyhow::Result<Vec<u8>> {
     }
 
     let mut state = STATE.get().unwrap().lock().unwrap();
+
+    // Remove all the objects that are not in the last frame.
+    for object in &mut state.objects {
+        object.retain(|label, _midpoint| new_objects.contains_key(label));
+    }
 
     state.objects.push_back(new_objects);
     if state.objects.len() >= conf.window as usize {
