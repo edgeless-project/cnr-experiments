@@ -41,8 +41,9 @@ def detect_objects_from_base64(
         "boxes": boxes,
         "labels": labels,
         "scores": confs,
-        "image_b64": image_b64,
     }
+
+    output["image_b64"] = image_b64
 
     return output
 
