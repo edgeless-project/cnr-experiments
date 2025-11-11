@@ -29,21 +29,34 @@ struct Input {
 
 struct State {}
 
-fn draw_bbox(img: &mut image::DynamicImage, bbox: [f32; 4], pixel: image::Rgba<u8>, width: u32) {
+fn draw_bbox(
+    img: &mut image::DynamicImage,
+    bbox: [f32; 4],
+    pixel: image::Rgba<u8>,
+    line_width: u32,
+) {
+    let img_width = img.width();
+    let img_height = img.height();
+    let mut pp = |x, y, p| {
+        if x < img_width && y < img_height {
+            img.put_pixel(x, y, p)
+        }
+    };
+
     let left_x = bbox[0].round() as u32;
     let right_x = bbox[2].round() as u32;
     let top_y = bbox[1].round() as u32;
     let bottom_y = bbox[3].round() as u32;
     for x in left_x..=right_x {
-        for offset in 0..width {
-            img.put_pixel(x, top_y + offset, pixel);
-            img.put_pixel(x, bottom_y - offset, pixel);
+        for offset in 0..line_width {
+            pp(x, top_y + offset, pixel);
+            pp(x, bottom_y - offset, pixel);
         }
     }
     for y in top_y..bottom_y {
-        for offset in 0..width {
-            img.put_pixel(left_x + offset, y, pixel);
-            img.put_pixel(right_x - offset, y, pixel);
+        for offset in 0..line_width {
+            pp(left_x + offset, y, pixel);
+            pp(right_x - offset, y, pixel);
         }
     }
 }
