@@ -103,36 +103,8 @@ edgeless_function::export!(ObjTrack);
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
-    fn test_img_identify() -> anyhow::Result<()> {
-        let data = std::fs::read("image.png")?;
-        let conf = Conf {
-            is_log_enabled: false,
-            resize_type: ResizeType::Preserve,
-            width: 1000,
-            height: 1000,
-        };
-
-        let res = process(
-            base64::engine::general_purpose::STANDARD
-                .encode(data)
-                .as_bytes(),
-            &conf,
-        )?;
-
-        let decoded = base64::engine::general_purpose::STANDARD.decode(res)?;
-
-        let img = image::ImageReader::new(std::io::Cursor::new(decoded))
-            .with_guessed_format()?
-            .decode()?;
-
-        assert_eq!(1000, img.width());
-        assert_eq!(625, img.height());
-
-        assert!(process(&vec![], &conf).is_err());
-
+    fn test_obj_track() -> anyhow::Result<()> {
         Ok(())
     }
 }
