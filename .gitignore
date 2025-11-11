@@ -13,3 +13,4 @@ experiments/006-ced21-small/orchestrator.toml
 rust_functions/*/*.wasm
 experiments/013-object_tracking/cli.toml
 experiments/013-object_tracking/edgeless_cli
+Atlanta_75.85.jpg
