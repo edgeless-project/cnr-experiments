@@ -5,6 +5,7 @@
     "build": "Cargo.toml",
     "outputs": [
         "out",
-        "err"
+        "err",
+        "next"
     ]
 }
