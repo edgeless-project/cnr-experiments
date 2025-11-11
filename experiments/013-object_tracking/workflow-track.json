@@ -1,0 +1,80 @@
+{
+    "functions": [
+        {
+            "name": "img_scale",
+            "class_specification": {
+                "id": "img_scale",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../rust_functions/img_scale/img_scale.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "err": "err-log",
+                "out": "obj_detect"
+            },
+            "annotations": {
+                "init-payload": "log=true,resize_type=preserve,width=1000,height=1000"
+            }
+        },
+        {
+            "name": "obj_track",
+            "class_specification": {
+                "id": "obj_track",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../rust_functions/obj_track/obj_track.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "err": "err-log",
+                "out": "http-poster"
+            },
+            "annotations": {
+                "init-payload": "log=true,window=1,width=3"
+            }
+        }
+    ],
+    "resources": [
+        {
+            "name": "http-ingress",
+            "class_type": "http-ingress",
+            "output_mapping": {
+                "new_request": "img_scale"
+            },
+            "configurations": {
+                "wf_id": "true",
+                "async": "true",
+                "encode_base64": "true"
+            }
+        },
+        {
+            "name": "err-log",
+            "class_type": "file-log",
+            "output_mapping": {},
+            "configurations": {
+                "filename": "err.log",
+                "add-timestamp": "true"
+            }
+        },
+        {
+            "name": "http-poster",
+            "class_type": "http-poster",
+            "output_mapping": {},
+            "configurations": {
+                "url": "http://localhost:3000/post",
+                "decode_base64": "true"
+            }
+        },
+        {
+            "name": "obj_detect",
+            "class_type": "obj_detect",
+            "output_mapping": {
+                "out": "obj_track",
+                "err": "err-log"
+            },
+            "configurations": {}
+        }
+    ],
+    "annotations": {}
+}

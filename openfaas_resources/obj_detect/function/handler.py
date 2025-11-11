@@ -6,6 +6,7 @@ import io
 from typing import Dict, Any, List, Optional
 from PIL import Image
 import numpy as np
+import json
 
 from ultralytics import YOLO  # type: ignore
 
@@ -36,7 +37,12 @@ def detect_objects_from_base64(
     class_ids = results.boxes.cls.cpu().numpy().astype(int).tolist()
     labels = [model.names[i] for i in class_ids]
 
-    output: Dict[str, Any] = {"boxes": boxes, "labels": labels, "scores": confs}
+    output: Dict[str, Any] = {
+        "boxes": boxes,
+        "labels": labels,
+        "scores": confs,
+        "image_b64": image_b64,
+    }
 
     return output
 
@@ -44,4 +50,4 @@ def detect_objects_from_base64(
 def handle(event, context):
     output = detect_objects_from_base64(model, event.body.decode("utf8"), 0.5)
 
-    return {"statusCode": 200, "body": f"{output}".encode("utf8")}
+    return {"statusCode": 200, "body": f"{json.dumps(output)}"}
