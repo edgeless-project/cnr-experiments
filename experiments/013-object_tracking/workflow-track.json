@@ -31,7 +31,7 @@
                 "out": "http-poster"
             },
             "annotations": {
-                "init-payload": "log=true,window=1,width=3"
+                "init-payload": "log=true,window=5,width=3"
             }
         }
     ],
