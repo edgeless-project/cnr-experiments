@@ -98,7 +98,7 @@ impl EdgeFunction for ObjTrack {
     }
 }
 
-#[allow(clippy::unsafe_op_in_unsafe_fn)]
+// #[allow(clippy::unsafe_op_in_unsafe_fn)]
 edgeless_function::export!(ObjTrack);
 
 #[cfg(test)]
