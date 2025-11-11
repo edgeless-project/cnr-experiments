@@ -19,6 +19,7 @@
         "rust_functions/state_sim/Cargo.toml",
         "rust_functions/img_identify/Cargo.toml",
         "rust_functions/img_scale/Cargo.toml",
+        "rust_functions/obj_track/Cargo.toml",
         "viewer/Cargo.toml"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:system",
