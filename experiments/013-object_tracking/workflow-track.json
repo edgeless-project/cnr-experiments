@@ -1,6 +1,23 @@
 {
     "functions": [
         {
+            "name": "flow_control",
+            "class_specification": {
+                "id": "flow_control",
+                "function_type": "RUST_WASM",
+                "version": "0.1",
+                "code": "../../rust_functions/flow_control/flow_control.wasm",
+                "outputs": []
+            },
+            "output_mapping": {
+                "out": "obj_detect",
+                "err": "err-log"
+            },
+            "annotations": {
+                "init-payload": "window=5,timeout=50,drop=false"
+            }
+        },
+        {
             "name": "img_scale",
             "class_specification": {
                 "id": "img_scale",
@@ -10,8 +27,8 @@
                 "outputs": []
             },
             "output_mapping": {
-                "err": "err-log",
-                "out": "obj_detect"
+                "out": "obj_detect",
+                "err": "err-log"
             },
             "annotations": {
                 "init-payload": "log=true,resize_type=preserve,width=1000,height=1000"
@@ -28,10 +45,11 @@
             },
             "output_mapping": {
                 "err": "err-log",
-                "out": "http-poster"
+                "out": "http-poster",
+                "next": "flow_control"
             },
             "annotations": {
-                "init-payload": "log=true,window=5,width=3"
+                "init-payload": "log=true,window=5,width=3,next=true"
             }
         }
     ],
@@ -40,7 +58,7 @@
             "name": "http-ingress",
             "class_type": "http-ingress",
             "output_mapping": {
-                "new_request": "img_scale"
+                "new_request": "flow_control"
             },
             "configurations": {
                 "wf_id": "true",

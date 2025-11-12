@@ -17,6 +17,9 @@ struct Conf {
     window: u32,
     /// Width of the bounding box.
     width: u32,
+    /// True: send an empty message to the "next" output channel every time
+    /// the incoming event is fully handled.
+    next: bool,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -245,7 +248,9 @@ impl EdgeFunction for ObjTrack {
             ),
         }
 
-        cast("next", &[]);
+        if conf.next {
+            cast("next", &[]);
+        }
     }
 
     fn handle_call(_src: InstanceId, _encoded_message: &[u8]) -> CallRet {
@@ -273,11 +278,13 @@ impl EdgeFunction for ObjTrack {
             .unwrap_or(&"3")
             .parse::<u32>()
             .unwrap_or(3);
+        let next = edgeless_function::arg_to_bool("next", &args);
 
         let _ = CONF.set(Conf {
             is_log_enabled,
             window,
             width,
+            next,
         });
         let _ = STATE.set(std::sync::Mutex::new(State::default()));
     }
