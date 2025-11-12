@@ -10,7 +10,7 @@
                 "outputs": []
             },
             "output_mapping": {
-                "out": "obj_detect",
+                "out": "img_scale",
                 "err": "err-log"
             },
             "annotations": {
@@ -31,7 +31,7 @@
                 "err": "err-log"
             },
             "annotations": {
-                "init-payload": "log=true,resize_type=preserve,width=1000,height=1000"
+                "init-payload": "log=false,resize_type=preserve,width=676,height=380"
             }
         },
         {
