@@ -71,7 +71,11 @@ Should give:
 
 ## Docker instructions
 
-Tested on NVIDIA AGX Orin at R35 (Jetpack5)
+Tested on NVIDIA AGX Orin at R35 (Jetpack5), which also needed:
+
+```shell
+apt-get install nvidia-jetpack
+```
 
 Build Docker image with:
 
