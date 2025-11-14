@@ -1,6 +1,6 @@
 # 013-object_tracking
 
-## Instructions
+## Preliminary instructions
 
 Download and build EDGELESS (see building instructions in that repo).
 Make sure that `edgeless_inabox` and `edgeless_cli` can be executed, e.g.,
@@ -29,7 +29,6 @@ done
 
 ## Image identification (test)
 
-
 1. Shell A: `edgeless_inabox -t`
 2. Shell A: `edgeless_inabox`
 3. Shell B: `ID=$(edgeless_cli workflow start workflow-identify.json)`
@@ -44,7 +43,28 @@ done
 
 ## Object tracking
 
+The workflow is illustrated in the diagram below and is representative of an IoT analytics application for augmenting a stream of real-time images captured from a camera: objects are identified in each frame, and their trajectories are added to the last frame.
+
 ![](diagrams-workflow.png)
+
+The workflow includes both functions and resources.
+
+Functions:
+
+- `flow_control`, which regulates the rate of incoming frames to not overrun the capabilities of the hardware where heavy computation is happening;
+- `img_scale`, which resizes the incoming images to fit the given sizes, while preserving the width/height ratio;
+- `obj_track`, which receives the incoming image enriched with the objects identified in it and draws a bounding box around them; also, it keeps a memory of the last positions of the identified objects, to track them in the picture.
+
+Resources:
+
+- `http-ingress`, which is the entry point for the images captured by the camera;
+- `file-log`, which saves to a local file the errors encountered, with a timestamp;
+- `obj_detect,` which performs the detection of objects in a picture via an Ultralytics YOLO model running in a Docker container on the AGX Orin devices;
+- `http-poster`, which sends the final image to an external web server for visualization.
+
+This application showcases EDGELESS's ability to deploy stateful agents: the state consists of the objects detected in previous frames.
+
+Steps to reproduce (first check the preliminary instructions above):
 
 1. Shell A: `edgeless_inabox -t`
 2. Modify the file `node.toml` by adding the following lines:
