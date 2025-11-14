@@ -1,6 +1,6 @@
 # 013-object_tracking
 
-## Test workflows
+## Instructions
 
 Download and build EDGELESS (see building instructions in that repo).
 Make sure that `edgeless_inabox` and `edgeless_cli` can be executed, e.g.,
@@ -27,7 +27,8 @@ for f in rust_functions/* ; do
 done
 ```
 
-### Image identification
+## Image identification (test)
+
 
 1. Shell A: `edgeless_inabox -t`
 2. Shell A: `edgeless_inabox`
@@ -41,7 +42,9 @@ done
 9. Check the content of the file `info.log` in Shell A's working directory
    - You should see a single line ending with `{"width":2492,"height":1803}` 
 
-### Object tracking
+## Object tracking
+
+![](diagrams-workflow.png)
 
 1. Shell A: `edgeless_inabox -t`
 2. Modify the file `node.toml` by adding the following lines:
