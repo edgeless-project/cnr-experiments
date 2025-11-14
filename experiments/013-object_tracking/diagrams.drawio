@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2025-11-14T13:18:05.328Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="aDiBiy3sAIsMjiwwNEBd" version="22.1.18" type="device">
+<mxfile host="Electron" modified="2025-11-14T13:25:34.339Z" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="h4grSRbuVc2tLIAxLrKc" version="22.1.18" type="device">
   <diagram name="workflow" id="seFdOg-QtaO97KZgyf4F">
     <mxGraphModel dx="1114" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -49,7 +49,7 @@
         <mxCell id="AOvTorClSw90zEgavo8z-6" value="&lt;b&gt;obj_track&lt;/b&gt;&lt;br&gt;window=5,&lt;br&gt;width=3,next" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="520" y="400" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="AOvTorClSw90zEgavo8z-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="AOvTorClSw90zEgavo8z-21" target="AOvTorClSw90zEgavo8z-7" edge="1">
+        <mxCell id="AOvTorClSw90zEgavo8z-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="AOvTorClSw90zEgavo8z-7" target="nzXVKijAG3NiR8N7Z34b-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="AOvTorClSw90zEgavo8z-7" value="&lt;b&gt;http-poster&lt;/b&gt;&lt;br&gt;localhost:3000/post,&lt;br&gt;decode_base64" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
@@ -65,7 +65,7 @@
           <mxGeometry x="90" y="170" width="72" height="40" as="geometry" />
         </mxCell>
         <mxCell id="AOvTorClSw90zEgavo8z-21" value="" style="sketch=0;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;fillColor=#666666;aspect=fixed;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;shape=mxgraph.vvd.nsx_dashboard;" parent="1" vertex="1">
-          <mxGeometry x="93.74" y="400" width="64.52" height="60" as="geometry" />
+          <mxGeometry x="95.47999999999999" y="280" width="64.52" height="60" as="geometry" />
         </mxCell>
         <mxCell id="AOvTorClSw90zEgavo8z-25" value="HTTP POST&lt;br style=&quot;font-size: 11px;&quot;&gt;image (bin)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
           <mxGeometry x="160" y="160" width="120" height="30" as="geometry" />
@@ -85,8 +85,8 @@
         <mxCell id="AOvTorClSw90zEgavo8z-30" value="image (b64)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
           <mxGeometry x="400" y="430" width="120" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="AOvTorClSw90zEgavo8z-31" value="view from browser" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
-          <mxGeometry x="158.26" y="430" width="120" height="20" as="geometry" />
+        <mxCell id="AOvTorClSw90zEgavo8z-31" value="view&lt;br&gt;from&lt;br&gt;browser" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="70" y="340" width="58" height="50" as="geometry" />
         </mxCell>
         <mxCell id="AOvTorClSw90zEgavo8z-32" value="empty" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" parent="1" vertex="1">
           <mxGeometry x="490" y="290" width="50" height="20" as="geometry" />
@@ -150,6 +150,18 @@
         </mxCell>
         <mxCell id="AOvTorClSw90zEgavo8z-58" value="err" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;fontFamily=Courier New;" parent="1" vertex="1">
           <mxGeometry x="612.5" y="220" width="55" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="nzXVKijAG3NiR8N7Z34b-2" value="web server" style="sketch=0;aspect=fixed;pointerEvents=1;shadow=0;dashed=0;html=1;strokeColor=none;labelPosition=center;verticalLabelPosition=bottom;verticalAlign=top;align=center;fillColor=#666666;shape=mxgraph.mscae.enterprise.web_server" vertex="1" parent="1">
+          <mxGeometry x="110" y="399" width="48" height="63.16" as="geometry" />
+        </mxCell>
+        <mxCell id="nzXVKijAG3NiR8N7Z34b-3" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1" source="AOvTorClSw90zEgavo8z-21">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="540" y="410" as="sourcePoint" />
+            <mxPoint x="128" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="nzXVKijAG3NiR8N7Z34b-4" value="HTTP POST&lt;br style=&quot;font-size: 11px;&quot;&gt;image (bin)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="160" y="399" width="120" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
