@@ -1,4 +1,8 @@
+// SPDX-FileCopyrightText: © 2025 Claudio Cicconetti <c.cicconetti@iit.cnr.it>
+// SPDX-License-Identifier: MIT
+
 use actix_multipart::Multipart;
+use actix_web::http::Uri;
 use actix_web::mime;
 use actix_web::{
     App, HttpRequest, HttpResponse, HttpServer, Responder,
@@ -6,32 +10,89 @@ use actix_web::{
     web,
 };
 use bytes::Bytes;
+use clap::Parser;
 use futures_util::StreamExt;
 use image::ImageFormat;
 use image::codecs::jpeg::JpegEncoder;
 use once_cell::sync::Lazy;
+use std::io::Write;
+use std::str::FromStr;
 use std::{
     sync::{Arc, Mutex},
     time::Duration,
 };
 use tokio::time::sleep;
 
-static LAST_FRAME: Lazy<Arc<Mutex<Option<Bytes>>>> = Lazy::new(|| Arc::new(Mutex::new(None)));
+#[derive(Debug, clap::Parser)]
+#[command(long_about = "Simple image viewer from HTTP POST commands")]
+struct Args {
+    /// Web server URL.
+    #[arg(short, long, default_value_t = String::from("http://localhost:3000"))]
+    url: String,
+    /// Save timestamps to this file.
+    #[arg(short, long, default_value_t = String::default())]
+    output: String,
+    /// Number of workers.
+    #[arg(short, long, default_value_t = std::thread::available_parallelism().unwrap().into())]
+    workers: usize,
+    /// Do not publish incoming images.
+    #[arg(long, default_value_t = false)]
+    dry: bool,
+}
+
+fn print_timestamp(output: Option<&mut std::fs::File>) {
+    if let Some(mut output) = output {
+        let now = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap_or_default();
+        let _ = writeln!(&mut output, "{}", now.as_secs_f64());
+    }
+}
+
+#[derive(Default)]
+struct State {
+    last_frame: Option<Bytes>,
+    output: Option<std::fs::File>,
+    dry: bool,
+}
+
+static STATE: Lazy<Arc<Mutex<State>>> = Lazy::new(|| Arc::new(Mutex::new(State::default())));
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    println!("Server running at http://localhost:3000");
+    let args = Args::parse();
 
-    HttpServer::new(|| {
-        App::new()
-            .route("/", web::get().to(index))
-            .route("/post", web::post().to(post))
-            .route("/upload", web::post().to(upload))
-            .route("/stream", web::get().to(stream))
-    })
-    .bind(("0.0.0.0", 3000))?
-    .run()
-    .await
+    {
+        let mut state = STATE.lock().unwrap();
+
+        if !args.output.is_empty() {
+            println!("Saving timestamps to '{}'", args.output);
+            state.output = Some(std::fs::File::create(&args.output)?);
+        }
+        state.dry = args.dry;
+    }
+
+    println!("Server running at {}", args.url);
+
+    match Uri::from_str(&args.url) {
+        Ok(uri) => {
+            HttpServer::new(|| {
+                App::new()
+                    .route("/", web::get().to(index))
+                    .route("/post", web::post().to(post))
+                    .route("/upload", web::post().to(upload))
+                    .route("/stream", web::get().to(stream))
+            })
+            .workers(args.workers)
+            .bind((
+                uri.host().unwrap_or(&"0.0.0.0"),
+                uri.port_u16().unwrap_or(3000),
+            ))?
+            .run()
+            .await
+        }
+        Err(_) => Err(std::io::Error::other("invalid URL specified")),
+    }
 }
 
 async fn index() -> impl Responder {
@@ -49,6 +110,16 @@ async fn index() -> impl Responder {
 }
 
 async fn post(mut payload: web::Payload) -> impl Responder {
+    let dry;
+    {
+        let mut state = STATE.lock().unwrap();
+        print_timestamp(state.output.as_mut());
+        dry = state.dry;
+    }
+    if dry {
+        payload.count().await;
+        return HttpResponse::Ok().body("OK");
+    }
     let mut data = web::BytesMut::new();
     while let Some(Ok(chunk)) = payload.next().await {
         data.extend_from_slice(&chunk);
@@ -56,10 +127,9 @@ async fn post(mut payload: web::Payload) -> impl Responder {
 
     let image_data = data.freeze();
 
-    let mut frame = LAST_FRAME.lock().unwrap();
-    *frame = Some(image_data);
+    STATE.lock().unwrap().last_frame = Some(image_data);
 
-    return HttpResponse::Ok().body("Image uploaded");
+    return HttpResponse::Ok().body("Image posted");
 }
 
 async fn upload(mut payload: Multipart) -> impl Responder {
@@ -94,8 +164,7 @@ async fn upload(mut payload: Multipart) -> impl Responder {
                     _ => return HttpResponse::BadRequest().body("Unsupported image type"),
                 };
 
-                let mut frame = LAST_FRAME.lock().unwrap();
-                *frame = Some(final_data);
+                STATE.lock().unwrap().last_frame = Some(final_data);
 
                 return HttpResponse::Ok().body("Image uploaded");
             }
@@ -111,8 +180,8 @@ async fn stream(_req: HttpRequest) -> impl Responder {
             sleep(Duration::from_millis(100)).await;
 
             let maybe_img = {
-                let lock = LAST_FRAME.lock().unwrap();
-                lock.clone()
+                let state = STATE.lock().unwrap();
+                state.last_frame.clone()
             };
 
             if let Some(img) = maybe_img {
