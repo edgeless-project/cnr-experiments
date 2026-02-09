@@ -512,7 +512,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
 name = "edgeless_api"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -542,7 +542,7 @@ dependencies = [
 
 [[package]]
 name = "edgeless_api_core"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "coap-lite",
  "heapless",
@@ -554,7 +554,7 @@ dependencies = [
 
 [[package]]
 name = "edgeless_dataplane"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -573,7 +573,7 @@ dependencies = [
 
 [[package]]
 name = "edgeless_orc"
-version = "1.1.0"
+version = "1.2.0"
 dependencies = [
  "anyhow",
  "ascii_table",
