@@ -4,3 +4,4 @@ edgeless_benchmark
 *.pdf
 *.png
 data/
+cli.toml
