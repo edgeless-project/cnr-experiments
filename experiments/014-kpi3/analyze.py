@@ -73,8 +73,23 @@ df_health["node_type"] = df_health["hostname"].str.extract(r"^([^-]+)")
 
 df_samples["workflow_id"] = df_samples["identifier"].map(pid_to_wid)
 
-# Aggregates in new data frames
+df_viewer_minmax = (
+    df_viewer.groupby("experiment")["timestamp"].agg(["min", "max"]).reset_index()
+)
 
+# Remove samples outside the collection timestamps from all data frames
+df_health = (
+    df_health.merge(df_viewer_minmax, on="experiment")
+    .query("timestamp >= min and timestamp <= max")
+    .drop(columns=["min", "max"])
+)
+df_samples = (
+    df_samples.merge(df_viewer_minmax, on="experiment")
+    .query("timestamp >= min and timestamp <= max")
+    .drop(columns=["min", "max"])
+)
+
+# Aggregates in new data frames
 df_viewer_tpt = (
     df_viewer.groupby("experiment")["timestamp"]
     .agg(lambda x: x.count() / (x.max() - x.min()))
@@ -108,9 +123,26 @@ df_samples_latency = (
 if not os.path.isdir("plots"):
     os.mkdir("plots")
 
+# experiments = sorted(df_viewer_tpt["experiment"].unique())
+experiments = [
+    "multi-30",
+    "single-30",
+    "multi-60",
+    "single-60",
+    "multi-120",
+    "single-120",
+]
+
 # Application throughput
 fig, ax = plt.subplots()
-sns.barplot(df_viewer_tpt, x="experiment", y="throughput", ax=ax, legend=False)
+sns.barplot(
+    df_viewer_tpt,
+    x="experiment",
+    y="throughput",
+    ax=ax,
+    legend=False,
+    order=experiments,
+)
 ax.set_xlabel("Experiment")
 ax.set_ylabel("Application throughput (messages/s)")
 fig.suptitle("")
@@ -118,9 +150,17 @@ plt.savefig(f"plots/{basename}-app-throughput.{IMAGE_TYPE}")
 
 # Network traffic
 fig, ax = plt.subplots()
-sns.boxplot(df_throughput, x="experiment", y="throughput", ax=ax, legend=False)
+sns.boxplot(
+    df_throughput,
+    x="experiment",
+    y="throughput",
+    ax=ax,
+    legend=False,
+    order=experiments,
+)
 ax.set_xlabel("Experiment")
 ax.set_ylabel("Average node traffic (kb/s)")
+ax.grid(visible=True)
 fig.suptitle("")
 plt.savefig(f"plots/{basename}-network-throughput.{IMAGE_TYPE}")
 
@@ -135,20 +175,42 @@ metrics = [
 for metric, label in metrics:
     fig, ax = plt.subplots()
     if metric == "gpu_load_perc":
-        sns.violinplot(df_health, x="experiment", y=metric, ax=ax, legend=False)
+        sns.violinplot(
+            df_health,
+            x="experiment",
+            y=metric,
+            ax=ax,
+            legend=False,
+            order=experiments,
+        )
     else:
         sns.violinplot(
-            df_health, x="experiment", y=metric, hue="node_type", ax=ax, legend=True
+            df_health,
+            x="experiment",
+            y=metric,
+            hue="node_type",
+            ax=ax,
+            legend=True,
+            order=experiments,
         )
     ax.set_xlabel("Experiment")
+    ax.grid(visible=True)
     ax.set_ylabel(label)
     fig.suptitle("")
     plt.savefig(f"plots/{basename}-{metric}.{IMAGE_TYPE}")
 
 # Workflow metrics
 fig, ax = plt.subplots()
-sns.violinplot(df_samples_latency, x="experiment", y="latency", ax=ax, legend=False)
+sns.violinplot(
+    df_samples_latency,
+    x="experiment",
+    y="latency",
+    ax=ax,
+    legend=False,
+    order=experiments,
+)
 ax.set_xlabel("Experiment")
 ax.set_ylabel("Workflow latency (ms)")
+ax.grid(visible=True)
 fig.suptitle("")
-plt.savefig(f"plots/{basename}-network-throughput.{IMAGE_TYPE}")
+plt.savefig(f"plots/{basename}-app-latency.{IMAGE_TYPE}")
