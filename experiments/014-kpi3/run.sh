@@ -36,8 +36,8 @@ sleep 1
 
 $benchmark_exec \
   -c "http://172.20.1.3:7001" \
-  --duration 300 \
-  --lifetime 60 \
+  --duration 1800 \
+  --lifetime 240 \
   --interarrival 2 \
   --arrival-model poisson  \
   --wf-type "json-spec;workflow.json" \
